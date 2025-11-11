@@ -1,0 +1,62 @@
+{
+  "name": "nfl-dashboard",
+  "version": "1.0.0",
+  "description": "Beautiful NFL Dashboard with ESPN API integration",
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build && electron-builder",
+    "preview": "vite preview",
+    "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "electron:build": "tsc && vite build && electron-builder"
+  },
+  "keywords": [
+    "nfl",
+    "espn",
+    "electron",
+    "dashboard"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "better-sqlite3": "^9.2.2",
+    "axios": "^1.6.5",
+    "date-fns": "^3.0.6"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@types/better-sqlite3": "^7.6.8",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.1.4",
+    "electron-builder": "^24.9.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.11",
+    "vite-plugin-electron": "^0.28.1",
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
+  },
+  "build": {
+    "appId": "com.nfldashboard.app",
+    "productName": "NFL Dashboard",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}

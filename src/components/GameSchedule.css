@@ -1,0 +1,243 @@
+.game-schedule {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.schedule-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.schedule-header .team-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.schedule-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.schedule-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+.schedule-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.schedule-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.schedule-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.schedule-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.no-games {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+.game-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 60px 1fr 120px 100px;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.game-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateX(4px);
+}
+
+.game-item.selected {
+  border-color: #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+  box-shadow: 0 0 20px rgba(74, 158, 255, 0.2);
+}
+
+.game-item.completed {
+  opacity: 0.85;
+}
+
+.game-item.in-progress {
+  border-color: #ff4444;
+  animation: pulse-border 2s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+  }
+  50% {
+    border-color: #ff6666;
+    box-shadow: 0 0 20px rgba(255, 68, 68, 0.5);
+  }
+}
+
+.game-item.won {
+  border-left: 4px solid #4caf50;
+}
+
+.game-item.lost {
+  border-left: 4px solid #f44336;
+}
+
+.game-week {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.game-date {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.game-matchup {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.game-location-badge {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 32px;
+  text-align: center;
+}
+
+.opponent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.opponent img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.opponent-abbr {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.game-score {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  justify-content: center;
+}
+
+.game-score .winning {
+  color: #4caf50;
+}
+
+.game-score .score-separator {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 16px;
+}
+
+.game-time {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.live-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4444;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.result-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.result-badge.win {
+  background: #4caf50;
+  color: white;
+}
+
+.result-badge.loss {
+  background: #f44336;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .game-item {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .game-week,
+  .game-date {
+    text-align: left;
+  }
+}
