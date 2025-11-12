@@ -1,11 +1,12 @@
 {
   "name": "nfl-dashboard",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Beautiful NFL Dashboard with ESPN API integration",
   "main": "dist-electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build && electron-builder",
+    "build:win": "tsc && vite build && electron-builder --win --x64",
     "preview": "vite preview",
     "electron:dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "electron:build": "tsc && vite build && electron-builder"
@@ -53,7 +54,12 @@
       "target": "dmg"
     },
     "win": {
-      "target": "nsis"
+      "target": [
+        {
+          "target": "dir",
+          "arch": ["x64"]
+        }
+      ]
     },
     "linux": {
       "target": "AppImage"

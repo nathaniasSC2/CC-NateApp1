@@ -10,7 +10,8 @@ lerna-debug.log*
 node_modules
 dist
 dist-electron
-release
+release/
+!releases/
 *.local
 
 # Editor directories and files
@@ -27,3 +28,4 @@ release
 # Database
 *.db
 *.db-journal
+releases/**/*.zip
