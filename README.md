@@ -96,6 +96,28 @@ npm run build        # Auto-detect platform
 npm run build:win    # Windows specifically
 ```
 
+## Troubleshooting
+
+### Windows: "Windows SDK not found" Error
+
+If you get build errors related to Windows SDK or better-sqlite3:
+
+**Quick Fix (PowerShell as Admin):**
+```powershell
+npm install -g windows-build-tools
+```
+
+**Or use Node.js LTS:** Download v22.x from https://nodejs.org/
+
+**See full guide:** [WINDOWS-BUILD-ISSUES.md](./WINDOWS-BUILD-ISSUES.md)
+
+### Prerequisites
+
+- **Node.js**: v18.x, v20.x, or v22.x LTS (recommended)
+- **Windows**: Visual Studio Build Tools or Windows SDK
+- **macOS**: Xcode Command Line Tools
+- **Linux**: build-essential package
+
 ## Usage
 
 1. **First Launch**: The app will automatically sync NFL data from ESPN API

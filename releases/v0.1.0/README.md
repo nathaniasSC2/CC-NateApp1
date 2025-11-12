@@ -53,13 +53,36 @@ A pre-built Windows executable (114 MB) is available on request or can be hosted
 - First launch requires internet connection to sync NFL data
 - Season stats for upcoming games are limited
 - No application icon (uses default Electron icon)
+- **Windows Build:** Requires Windows SDK or Build Tools (see [WINDOWS-BUILD-ISSUES.md](../../WINDOWS-BUILD-ISSUES.md))
+
+## Troubleshooting
+
+### Windows: Build Errors
+
+If you encounter errors during `npm install`:
+
+1. **Install Windows Build Tools** (PowerShell as Admin):
+   ```powershell
+   npm install -g windows-build-tools
+   ```
+
+2. **Or use Node.js LTS v22.x** from https://nodejs.org/
+
+3. **See detailed guide:** [WINDOWS-BUILD-ISSUES.md](../../WINDOWS-BUILD-ISSUES.md)
 
 ## System Requirements
 
 ### Windows
 - Windows 10 or later (64-bit)
+- Node.js v18.x, v20.x, or v22.x LTS (recommended)
+- Visual Studio Build Tools or Windows SDK (for building)
 - 200 MB free disk space
 - Active internet connection for data sync
+
+### Build Prerequisites
+- **Windows:** Windows Build Tools (`npm install -g windows-build-tools`) OR Windows SDK
+- **macOS:** Xcode Command Line Tools
+- **Linux:** build-essential package
 
 ## Build from Source
 
