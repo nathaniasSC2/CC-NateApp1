@@ -35,6 +35,18 @@ See the [v0.1.0 release notes](./v0.1.0/README.md) for full details.
 
 ### Building from Source (All Platforms)
 
+**Quick Start - Windows:**
+```cmd
+setup-and-build.bat    # One-click setup & build
+run-app.bat            # Run the app
+```
+
+**Quick Start - Linux/Mac:**
+```bash
+./setup-and-build.sh   # One-click setup & build
+```
+
+**Manual Commands:**
 ```bash
 # Clone the repository
 git clone <repository-url>

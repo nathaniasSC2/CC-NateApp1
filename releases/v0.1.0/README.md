@@ -63,8 +63,18 @@ A pre-built Windows executable (114 MB) is available on request or can be hosted
 
 ## Build from Source
 
-If you prefer to build from source:
+**Quick Setup - Windows:**
+```cmd
+setup-and-build.bat    # One-click: installs & builds everything
+run-app.bat            # Run the built app
+```
 
+**Quick Setup - Linux/Mac:**
+```bash
+./setup-and-build.sh
+```
+
+**Manual Commands:**
 ```bash
 git clone <repository-url>
 cd CC-NateApp1

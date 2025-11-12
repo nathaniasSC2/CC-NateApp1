@@ -30,7 +30,55 @@ A beautiful, bloat-free Electron application for tracking NFL schedules, scores,
 - **ESPN API**: Real-time NFL data source
 - **date-fns**: Date formatting and manipulation
 
-## Installation
+## Quick Start
+
+### ⚡ One-Click Setup & Build (Windows)
+
+**Option 1: Batch Script (Recommended)**
+```cmd
+setup-and-build.bat
+```
+
+**Option 2: PowerShell**
+```powershell
+.\setup-and-build.ps1
+```
+
+This will:
+1. Check Node.js installation
+2. Install all dependencies
+3. Build the Windows application (~5 minutes)
+4. Create `release\win-unpacked\NFL Dashboard.exe`
+
+Then run:
+```cmd
+run-app.bat
+```
+
+Or navigate to `release\win-unpacked\` and double-click `NFL Dashboard.exe`
+
+### 🛠️ Development Mode
+
+**Quick start:**
+```cmd
+dev.bat
+```
+
+Or manually:
+```bash
+npm install
+npm run electron:dev
+```
+
+### 🐧 Linux / macOS
+
+```bash
+./setup-and-build.sh
+```
+
+## Manual Installation
+
+If you prefer manual setup:
 
 1. Install dependencies:
 ```bash
@@ -44,7 +92,8 @@ npm run electron:dev
 
 3. Build for production:
 ```bash
-npm run electron:build
+npm run build        # Auto-detect platform
+npm run build:win    # Windows specifically
 ```
 
 ## Usage
