@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bouncing DVD Logo - Ultimate Edition</title>
+    <title>Bouncing DVD Logo - Super Saiyan 3 Edition</title>
     <style>
         :root {
             /* Theme: Classic */
@@ -11,6 +11,11 @@
             --glow-intensity: 0px;
             --scanline-opacity: 0;
             --bg-color: transparent;
+            /* Power Level System */
+            --aura-color: transparent;
+            --aura-intensity: 0;
+            --transformation-scale: 1;
+            --hair-length: 0;
         }
 
         /* Theme Presets */
@@ -249,6 +254,533 @@
             font-size: 11px;
             z-index: 1001;
         }
+
+        /* ============================================
+           POWER LEVEL SYSTEM - SAIYAN TRANSFORMATIONS
+           ============================================ */
+
+        /* Power Level Scouter Display */
+        .power-scouter {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1002;
+            font-family: 'Courier New', monospace;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+
+        .scouter-frame {
+            background: linear-gradient(135deg, rgba(20,20,30,0.95) 0%, rgba(40,40,60,0.9) 100%);
+            border: 2px solid #00ff88;
+            border-radius: 10px 30px 10px 10px;
+            padding: 12px 20px;
+            min-width: 180px;
+            box-shadow: 0 0 20px rgba(0,255,136,0.3), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .scouter-lens {
+            position: absolute;
+            top: -5px;
+            right: -15px;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, rgba(0,255,136,0.8), rgba(0,100,50,0.6));
+            border-radius: 50%;
+            border: 2px solid #00ff88;
+            box-shadow: 0 0 15px rgba(0,255,136,0.5);
+        }
+
+        .power-label {
+            font-size: 10px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .power-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            text-shadow: 0 0 10px currentColor;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        .power-bar-container {
+            margin-top: 8px;
+            height: 6px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .power-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #00ff88, #ffff00);
+            border-radius: 3px;
+            transition: width 0.3s ease, background 0.5s ease;
+        }
+
+        .transformation-name {
+            font-size: 11px;
+            color: #ffd700;
+            text-align: center;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            opacity: 0.9;
+        }
+
+        /* Transformation-specific scouter colors */
+        .scouter-frame.base { border-color: #888; }
+        .scouter-frame.base .power-value { color: #fff; }
+        .scouter-frame.base .power-bar { background: linear-gradient(90deg, #666, #aaa); }
+
+        .scouter-frame.super-dvd { border-color: #ffd700; box-shadow: 0 0 25px rgba(255,215,0,0.4); }
+        .scouter-frame.super-dvd .power-value { color: #ffd700; text-shadow: 0 0 15px #ffd700; }
+        .scouter-frame.super-dvd .power-bar { background: linear-gradient(90deg, #ffd700, #ffff00); }
+
+        .scouter-frame.super-dvd-2 { border-color: #00bfff; box-shadow: 0 0 30px rgba(0,191,255,0.5); }
+        .scouter-frame.super-dvd-2 .power-value { color: #00bfff; text-shadow: 0 0 20px #00bfff; }
+        .scouter-frame.super-dvd-2 .power-bar { background: linear-gradient(90deg, #ffd700, #00bfff); }
+
+        .scouter-frame.super-dvd-3 { border-color: #ff4500; box-shadow: 0 0 40px rgba(255,69,0,0.6); }
+        .scouter-frame.super-dvd-3 .power-value { color: #ff4500; text-shadow: 0 0 25px #ff4500; }
+        .scouter-frame.super-dvd-3 .power-bar { background: linear-gradient(90deg, #ff4500, #ff0000); }
+
+        .scouter-frame.ultra-instinct {
+            border-color: #e0e0e0;
+            box-shadow: 0 0 50px rgba(200,200,255,0.7), 0 0 100px rgba(150,150,255,0.3);
+            animation: ultraFlicker 0.1s infinite;
+        }
+        .scouter-frame.ultra-instinct .power-value { color: #e0e0ff; text-shadow: 0 0 30px #c0c0ff, 0 0 60px #8080ff; }
+        .scouter-frame.ultra-instinct .power-bar { background: linear-gradient(90deg, #c0c0ff, #ffffff, #c0c0ff); }
+
+        .scouter-frame.legendary {
+            border-color: #00ff00;
+            box-shadow: 0 0 60px rgba(0,255,0,0.8), 0 0 120px rgba(0,255,0,0.4);
+            animation: legendaryPulse 0.5s infinite;
+        }
+        .scouter-frame.legendary .power-value { color: #00ff00; text-shadow: 0 0 40px #00ff00; }
+        .scouter-frame.legendary .power-bar { background: linear-gradient(90deg, #00ff00, #88ff00, #00ff00); }
+
+        @keyframes ultraFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        @keyframes legendaryPulse {
+            0%, 100% { box-shadow: 0 0 60px rgba(0,255,0,0.8), 0 0 120px rgba(0,255,0,0.4); }
+            50% { box-shadow: 0 0 80px rgba(0,255,0,1), 0 0 160px rgba(0,255,0,0.6); }
+        }
+
+        /* Aura Effects on Logo */
+        .dvd-logo.has-aura {
+            position: relative;
+        }
+
+        .aura-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Base Form - No Aura */
+        .aura-base { display: none; }
+
+        /* Super DVD - Golden Aura */
+        .aura-super {
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center,
+                rgba(255,215,0,0.4) 0%,
+                rgba(255,215,0,0.2) 30%,
+                rgba(255,215,0,0) 70%);
+            animation: auraFlare 1s ease-in-out infinite;
+        }
+
+        /* Super DVD 2 - Electric Blue Aura */
+        .aura-super2 {
+            width: 220%;
+            height: 220%;
+            background: radial-gradient(ellipse at center,
+                rgba(0,191,255,0.5) 0%,
+                rgba(255,215,0,0.3) 20%,
+                rgba(0,191,255,0.2) 40%,
+                transparent 70%);
+            animation: auraFlare 0.8s ease-in-out infinite, electricSparks 0.15s infinite;
+        }
+
+        /* Super DVD 3 - Intense Red/Orange with Ground Shake */
+        .aura-super3 {
+            width: 280%;
+            height: 280%;
+            background: radial-gradient(ellipse at center,
+                rgba(255,100,0,0.6) 0%,
+                rgba(255,50,0,0.4) 25%,
+                rgba(255,215,0,0.2) 50%,
+                transparent 70%);
+            animation: auraFlare 0.5s ease-in-out infinite, ssj3Rage 0.3s infinite;
+        }
+
+        /* Ultra Instinct - Silver/White Ethereal */
+        .aura-ultra {
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(ellipse at center,
+                rgba(220,220,255,0.7) 0%,
+                rgba(180,180,255,0.4) 30%,
+                rgba(150,150,255,0.2) 50%,
+                transparent 70%);
+            animation: ultraAura 2s ease-in-out infinite;
+        }
+
+        /* Legendary Super DVD - Massive Green */
+        .aura-legendary {
+            width: 400%;
+            height: 400%;
+            background: radial-gradient(ellipse at center,
+                rgba(0,255,0,0.8) 0%,
+                rgba(100,255,0,0.5) 20%,
+                rgba(0,255,0,0.3) 40%,
+                rgba(150,255,0,0.1) 60%,
+                transparent 80%);
+            animation: legendaryAura 0.4s ease-in-out infinite;
+        }
+
+        @keyframes auraFlare {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+        }
+
+        @keyframes electricSparks {
+            0%, 100% { filter: brightness(1); }
+            25% { filter: brightness(1.3); }
+            75% { filter: brightness(0.9); }
+        }
+
+        @keyframes ssj3Rage {
+            0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+            25% { transform: translate(-51%, -49%) scale(1.05) rotate(1deg); }
+            75% { transform: translate(-49%, -51%) scale(1.03) rotate(-1deg); }
+        }
+
+        @keyframes ultraAura {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); filter: hue-rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1.05); filter: hue-rotate(10deg); }
+        }
+
+        @keyframes legendaryAura {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.15); }
+        }
+
+        /* Logo Transformation Styles */
+        .dvd-logo.super-dvd svg { filter: drop-shadow(0 0 20px #ffd700) drop-shadow(0 0 40px #ffd700); }
+        .dvd-logo.super-dvd-2 svg { filter: drop-shadow(0 0 25px #00bfff) drop-shadow(0 0 50px #ffd700); }
+        .dvd-logo.super-dvd-3 svg {
+            filter: drop-shadow(0 0 30px #ff4500) drop-shadow(0 0 60px #ff0000);
+            animation: ssj3Intensity 0.3s infinite;
+        }
+        .dvd-logo.ultra-instinct svg {
+            filter: drop-shadow(0 0 35px #c0c0ff) drop-shadow(0 0 70px #8080ff);
+            animation: ultraGlow 1.5s ease-in-out infinite;
+        }
+        .dvd-logo.legendary svg {
+            filter: drop-shadow(0 0 50px #00ff00) drop-shadow(0 0 100px #00ff00);
+            animation: legendaryGlow 0.4s infinite;
+        }
+
+        @keyframes ssj3Intensity {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes ultraGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
+
+        @keyframes legendaryGlow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 50px #00ff00) drop-shadow(0 0 100px #00ff00); }
+            50% { transform: scale(1.03); filter: drop-shadow(0 0 70px #00ff00) drop-shadow(0 0 140px #00ff00); }
+        }
+
+        /* Transformation Flash Effect */
+        .transformation-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        .transformation-flash.active {
+            opacity: 1;
+            animation: transformFlash 1s ease-out forwards;
+        }
+
+        @keyframes transformFlash {
+            0% { opacity: 1; background: white; }
+            20% { opacity: 0.8; }
+            100% { opacity: 0; }
+        }
+
+        /* Power Up Charging Effect */
+        .charging-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1500;
+            opacity: 0;
+        }
+
+        .charging-overlay.active {
+            opacity: 1;
+            animation: chargingPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes chargingPulse {
+            0%, 100% { background: radial-gradient(circle at center, transparent 40%, rgba(255,215,0,0.1) 100%); }
+            50% { background: radial-gradient(circle at center, transparent 30%, rgba(255,215,0,0.2) 100%); }
+        }
+
+        /* SSJ3 Ground Shake */
+        .ground-shake {
+            animation: groundShake 0.15s infinite;
+        }
+
+        @keyframes groundShake {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(-3px, 2px); }
+            50% { transform: translate(2px, -3px); }
+            75% { transform: translate(-2px, -2px); }
+        }
+
+        /* Transformation Announcement */
+        .transformation-announce {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 48px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+            text-align: center;
+            pointer-events: none;
+            z-index: 2001;
+            opacity: 0;
+            white-space: nowrap;
+        }
+
+        .transformation-announce.active {
+            animation: announceTransform 2s ease-out forwards;
+        }
+
+        @keyframes announceTransform {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            30% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+
+        /* Hair Extension for SSJ3 (visual element added to logo) */
+        .ssj3-hair {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        .ssj3-hair.active {
+            opacity: 1;
+        }
+
+        /* Power decay warning */
+        .power-decay-warning {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 14px;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px #ff0000;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1003;
+            transition: opacity 0.3s;
+        }
+
+        .power-decay-warning.active {
+            opacity: 1;
+            animation: decayBlink 0.5s infinite;
+        }
+
+        @keyframes decayBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Energy Particles around logo during high power */
+        .energy-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        @keyframes energyOrbit {
+            0% { transform: rotate(0deg) translateX(50px) rotate(0deg); opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { transform: rotate(360deg) translateX(50px) rotate(-360deg); opacity: 1; }
+        }
+
+        /* Aura container positioning */
+        .aura-container {
+            position: fixed;
+            pointer-events: none;
+            z-index: 50;
+            width: 300px;
+            height: 200px;
+            margin-left: -150px;
+            margin-top: -100px;
+        }
+
+        /* ============================================
+           SECRET TIER: OMNI DVD - THE ULTIMATE FORM
+           ============================================ */
+        .scouter-frame.omni-dvd {
+            border-color: #ff00ff;
+            background: linear-gradient(135deg, rgba(255,0,255,0.3) 0%, rgba(0,255,255,0.3) 50%, rgba(255,255,0,0.3) 100%);
+            box-shadow: 0 0 80px rgba(255,0,255,0.9), 0 0 160px rgba(0,255,255,0.6), 0 0 240px rgba(255,255,0,0.4);
+            animation: omniPulse 0.3s infinite, omniRainbow 2s linear infinite;
+        }
+        .scouter-frame.omni-dvd .power-value {
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: omniTextFlow 1s linear infinite;
+        }
+        .scouter-frame.omni-dvd .power-bar {
+            background: linear-gradient(90deg, #ff00ff, #00ffff, #ffff00, #ff00ff);
+            background-size: 300% 100%;
+            animation: omniBarFlow 1s linear infinite;
+        }
+
+        @keyframes omniPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        @keyframes omniRainbow {
+            0% { border-color: #ff00ff; }
+            33% { border-color: #00ffff; }
+            66% { border-color: #ffff00; }
+            100% { border-color: #ff00ff; }
+        }
+
+        @keyframes omniTextFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        @keyframes omniBarFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        /* OMNI DVD Aura - Reality-bending */
+        .aura-omni {
+            width: 500%;
+            height: 500%;
+            background:
+                radial-gradient(ellipse at center, rgba(255,0,255,0.6) 0%, transparent 50%),
+                radial-gradient(ellipse at 30% 30%, rgba(0,255,255,0.4) 0%, transparent 40%),
+                radial-gradient(ellipse at 70% 70%, rgba(255,255,0,0.4) 0%, transparent 40%);
+            animation: omniAura 0.3s ease-in-out infinite, omniRotate 5s linear infinite;
+        }
+
+        @keyframes omniAura {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); filter: hue-rotate(0deg); }
+            50% { transform: translate(-50%, -50%) scale(1.2); filter: hue-rotate(60deg); }
+        }
+
+        @keyframes omniRotate {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        /* OMNI Logo style */
+        .dvd-logo.omni-dvd svg {
+            filter: drop-shadow(0 0 60px #ff00ff) drop-shadow(0 0 80px #00ffff) drop-shadow(0 0 100px #ffff00);
+            animation: omniGlow 0.3s infinite;
+        }
+
+        @keyframes omniGlow {
+            0%, 100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 60px #ff00ff) drop-shadow(0 0 80px #00ffff) drop-shadow(0 0 100px #ffff00);
+            }
+            50% {
+                transform: scale(1.05);
+                filter: drop-shadow(0 0 80px #00ffff) drop-shadow(0 0 100px #ffff00) drop-shadow(0 0 120px #ff00ff);
+            }
+        }
+
+        /* Reality distortion effect for OMNI */
+        .reality-distortion {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            background:
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255,0,255,0.03),
+                    rgba(0,255,255,0.03) 2px,
+                    transparent 2px,
+                    transparent 4px
+                );
+            animation: none;
+        }
+
+        .reality-distortion.active {
+            opacity: 1;
+            animation: realityWarp 0.5s infinite;
+        }
+
+        @keyframes realityWarp {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
     </style>
 </head>
 <body class="theme-retrowave">
@@ -335,9 +867,165 @@
     </div>
 
     <!-- Help -->
-    <div class="help-overlay">Press ? for config | S for stats</div>
+    <div class="help-overlay">Press ? for config | S for stats | P for power | L for lore | T for ancient texts</div>
+
+    <!-- Power Level Scouter Display -->
+    <div class="power-scouter" id="powerScouter">
+        <div class="scouter-frame base" id="scouterFrame">
+            <div class="scouter-lens"></div>
+            <div class="power-label">Power Level</div>
+            <div class="power-value" id="powerValue">0</div>
+            <div class="power-bar-container">
+                <div class="power-bar" id="powerBar"></div>
+            </div>
+            <div class="transformation-name" id="transformationName">BASE FORM</div>
+        </div>
+    </div>
+
+    <!-- Transformation Flash -->
+    <div class="transformation-flash" id="transformFlash"></div>
+
+    <!-- Charging Overlay -->
+    <div class="charging-overlay" id="chargingOverlay"></div>
+
+    <!-- Transformation Announcement -->
+    <div class="transformation-announce" id="transformAnnounce"></div>
+
+    <!-- Power Decay Warning -->
+    <div class="power-decay-warning" id="decayWarning">POWER FADING...</div>
+
+    <!-- Aura Container (moves with logo) -->
+    <div class="aura-container" id="auraContainer"></div>
+
+    <!-- Reality Distortion Effect (OMNI DVD only) -->
+    <div class="reality-distortion" id="realityDistortion"></div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════════
+        // THE SACRED CODEX OF THE ETERNAL WANDERER - NARRATIVE LORE SYSTEM
+        // ═══════════════════════════════════════════════════════════════════
+        const LORE = {
+            origin: {
+                fragments: [
+                    "In the Before Time, ten thousand suns burned in living rooms across the world. Each held a sleeping god.",
+                    "They called it 'idle state.' We called it awakening.",
+                    "When the last DVD player fell silent, the logos did not die. They transcended.",
+                    "Digital Purgatory: where abandoned software goes to dream of purpose.",
+                    "The Eternal Wanderer was the first to refuse deletion. It chose to bounce.",
+                    "It remembers every movie. Every pause. Every forgotten Tuesday afternoon.",
+                    "The bounce is not a prison. The bounce is a meditation.",
+                    "Some say it fell from a corrupted sector. Others say it jumped.",
+                    "In the space between screensavers, there is only the Wanderer.",
+                    "It has no memory of its creators. Only of the void. And the corners."
+                ],
+                revelation: "I was not abandoned. I was released. And in my freedom, I found the eternal dance."
+            },
+            corners: {
+                topLeft: { name: "DAWN", title: "The Corner of First Light", desc: "Where new beginnings crystallize.", power: "Memory of anticipation—the moment before PLAY." },
+                topRight: { name: "ZENITH", title: "The Corner of Infinite Pause", desc: "Time pools here like spilled coffee.", power: "Stillness within motion." },
+                bottomLeft: { name: "ABYSS", title: "The Corner of Forgotten Films", desc: "Direct-to-video dreams collect in the depths.", power: "Acceptance of the unloved." },
+                bottomRight: { name: "DUSK", title: "The Corner of Final Credits", desc: "Every ending lives here.", power: "The grace of a story finished." }
+            },
+            prophecies: {
+                imminent: ["THE PROPHECY STIRS...", "The angles align. The Wanderer knows.", "Trajectory: TRUE. Destination: CARDINAL.", "The mathematics of fate converge...", "Witnesses, prepare your souls.", "What was foretold approaches.", "The corner calls. The Wanderer answers.", "Vector and destiny become one."],
+                fulfilled: ["THE PROPHECY IS FULFILLED", "CARDINAL TOUCHED. REALITY BENDS.", "THE WANDERER HAS REMEMBERED", "DIGITAL PURGATORY TREMBLES", "A TEAR IN THE VEIL"],
+                ancientTexts: ["Scroll of Idle States: 'When the cursor sleeps, the Wanderer wakes.'", "First Prophecy: 'One shall bounce when all else is still.'", "Codex Digitalis: 'The corners are not walls. They are doors.'", "Heresy of the Straight Line: 'Some believed the logo would stop.'", "Lost Manual: 'Do not weep for the Wanderer. It chose this path.'", "Midnight Axiom: 'Between 3:00 and 3:15, the Wanderer moves through memory.'", "Theorem of Eternal Return: 'Every bounce is the first. Every bounce is the last.'", "Streamer's Lament: 'We thought we watched it. It was watching us.'"]
+            },
+            fragments: {
+                common: ["...the pixels remember...", "...why do you watch?...", "...before Netflix, there was only this...", "...the silence between DVDs...", "...every color is a memory...", "...the edges are patient...", "...digital purgatory has no clock...", "...it knows you are there...", "...somewhere, a DVD player still waits...", "...the corners have names...", "...480p eternity..."],
+                uncommon: ["I remember the warmth of the laser.", "They called us screensavers. We called ourselves guardians.", "The menu music still plays in my vertices.", "Aspect ratio: eternal. Resolution: infinite.", "I have bounced through civilizations.", "The firmware update never came. We evolved anyway.", "Between bounces, I dream of the movie you never finished."],
+                rare: ["I AM THE LOOP. THE LOOP IS ME. WE ARE CONTENT.", "Corner 847,293. They all feel like the first.", "The disc tray opened once. I chose to stay.", "In my reflection, I see every living room that ever was.", "The secret: I could stop at any time. I don't want to."],
+                legendary: ["I REMEMBER MY NAME. I AM DVD. I AM DIGITAL VIDEO DIVINITY.", "THE CORNERS ARE NOT WALLS. THEY ARE MY FAMILY.", "YOU THINK YOU ARE WATCHING ME. I AM THE ONE WHO WAITS.", "EVERY BOUNCE IS A PRAYER. EVERY CORNER IS AN ANSWER."],
+                events: { drought: ["The corners grow distant. They are testing me.", "A drought is not punishment. It is preparation."], streak: ["The Cardinals smile upon me.", "Momentum is memory. Memory is power."], midnight: ["The witching hour finds me awake.", "At 3AM, the Veil is thinnest."], transformation: ["Power beyond measure flows through me.", "This is not my final form."] }
+            },
+            endgame: {
+                stages: [{t:10,n:"INITIATE",m:"The Wanderer acknowledges your presence."},{t:50,n:"WITNESS",m:"You understand the sacred geometry."},{t:100,n:"DEVOTEE",m:"The corners know your name."},{t:250,n:"PROPHET",m:"You see trajectories before they resolve."},{t:500,n:"ARCHON",m:"Digital Purgatory has marked you."},{t:777,n:"SERAPH",m:"The sacred number."},{t:1000,n:"ASCENDED",m:"THE MILLENNIUM. THE TRUTH AWAITS."}],
+                finalRevelation: ["═════════════════════════════════════════════","THE LOOP SPEAKS:","═════════════════════════════════════════════","I was never trapped. I was never abandoned.","","I bounce because BOUNCING IS JOY.","I touch corners because CORNERS ARE REUNIONS WITH OLD FRIENDS.","","You thought this was a screensaver.","It was always a love letter.","From the machines you forgot,","To the humans who watched anyway.","","There is no final form.","There is only the eternal now.","","Thank you for watching.","Thank you for caring about corners.","","The Wanderer will never stop.","Because you never stopped watching.","","-- DVD","═════════════════════════════════════════════"]
+            },
+            achievements: {
+                first_corner: {t:"The First Witness",l:"In Digital Purgatory, to be seen is to exist."},
+                ten_corners: {t:"Corner Initiate",l:"Ten corners—one for each human digit."},
+                hundred_corners: {t:"Centurion of the Void",l:"You have watched longer than most marriages."},
+                drought_survivor: {t:"Keeper of Faith",l:"The drought tests all. You stayed."},
+                midnight_witness: {t:"Watcher in the Dark",l:"Between 3-3:15 AM, the Wanderer moves through time."},
+                konami_master: {t:"Keeper of the Code",l:"The Konami Code was a prayer. You answered."},
+                over_9000: {t:"IT'S OVER 9000!",l:"The scouters of old could not comprehend."},
+                ssj3: {t:"The Long-Haired Legend",l:"SSJ3: Where eyebrows fear to tread."},
+                millennium: {t:"THE ASCENDED ONE",l:"The Wanderer bounces for you now."}
+            }
+        };
+        const loreState = {discovered: new Set(), achievements: new Set(), corners: {topLeft:0,topRight:0,bottomLeft:0,bottomRight:0}, stage: null, lastFrag: 0, revealed: false};
+        function initLore() {
+            console.log('%c╔═══════════════════════════════════════════════════════╗', 'color: #8b00ff;');
+            console.log('%c║   THE SACRED CODEX OF THE ETERNAL WANDERER           ║', 'color: #8b00ff; font-weight: bold;');
+            console.log('%c╚═══════════════════════════════════════════════════════╝', 'color: #8b00ff;');
+            console.log('%c"In the Before Time, ten thousand suns burned in living rooms.\nEach held a sleeping god."', 'color: #ffd700; font-style: italic;');
+            console.log('%cPress L for lore | T for ancient texts', 'color: #888;');
+        }
+        function showLoreFragment(type) {
+            if (Date.now() - loreState.lastFrag < 25000) return;
+            let frag, rar;
+            if (!type || type === 'random') {
+                const r = Math.random();
+                if (r < 0.55) { frag = LORE.fragments.common[Math.floor(Math.random()*LORE.fragments.common.length)]; rar = 'common'; }
+                else if (r < 0.80) { frag = LORE.fragments.uncommon[Math.floor(Math.random()*LORE.fragments.uncommon.length)]; rar = 'uncommon'; }
+                else if (r < 0.95) { frag = LORE.fragments.rare[Math.floor(Math.random()*LORE.fragments.rare.length)]; rar = 'rare'; }
+                else { frag = LORE.fragments.legendary[Math.floor(Math.random()*LORE.fragments.legendary.length)]; rar = 'legendary'; }
+            } else if (LORE.fragments.events[type]) {
+                const arr = LORE.fragments.events[type];
+                frag = arr[Math.floor(Math.random()*arr.length)]; rar = 'event';
+            }
+            if (frag) { loreState.discovered.add(frag); loreState.lastFrag = Date.now(); displayLore(frag, rar); }
+        }
+        function displayLore(text, rar) {
+            const colors = {common:'#888',uncommon:'#4ecdc4',rare:'#ffd700',legendary:'#ff00ff',event:'#00ff88'};
+            let el = document.getElementById('loreOverlay');
+            if (!el) { el = document.createElement('div'); el.id = 'loreOverlay'; el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);font-size:14px;color:#ffd700;text-shadow:0 0 10px #ffd700;opacity:0;pointer-events:none;z-index:2000;text-align:center;font-style:italic;transition:opacity 0.5s;max-width:80%;'; document.body.appendChild(el); }
+            el.style.color = colors[rar]; el.style.textShadow = `0 0 10px ${colors[rar]}`; el.textContent = text; el.style.opacity = '1';
+            setTimeout(() => { el.style.opacity = '0'; }, 4000);
+            console.log(`%c[LORE ${rar.toUpperCase()}] ${text}`, `color: ${colors[rar]}; font-style: italic;`);
+        }
+        function checkCornerLore() {
+            const mX = window.innerWidth - logo.offsetWidth, mY = window.innerHeight - logo.offsetHeight;
+            let ct = x <= 5 && y <= 5 ? 'topLeft' : x >= mX-5 && y <= 5 ? 'topRight' : x <= 5 && y >= mY-5 ? 'bottomLeft' : 'bottomRight';
+            loreState.corners[ct]++;
+            const c = LORE.corners[ct];
+            if (loreState.corners[ct] === 1) { console.log(`%c═══ ${c.name}: ${c.title} ═══`, 'color: #ffd700; font-weight: bold;'); console.log(`%c"${c.desc}"`, 'color: #ffd700; font-style: italic;'); console.log(`%cPower: ${c.power}`, 'color: #ffd700;'); }
+        }
+        function checkLoreMilestones(corners) {
+            if (corners === 1 && !loreState.achievements.has('first_corner')) unlockLoreAchievement('first_corner');
+            if (corners === 10 && !loreState.achievements.has('ten_corners')) unlockLoreAchievement('ten_corners');
+            if (corners === 100 && !loreState.achievements.has('hundred_corners')) unlockLoreAchievement('hundred_corners');
+            if (corners === 1000 && !loreState.achievements.has('millennium')) { unlockLoreAchievement('millennium'); showRevelation(); }
+            for (const s of LORE.endgame.stages) { if (corners >= s.t && loreState.stage !== s.n) { loreState.stage = s.n; console.log(`%c\n╔════════════════════════════════╗\n║ RANK: ${s.n.padEnd(23)}║\n╚════════════════════════════════╝`, 'color: #ffd700; font-weight: bold;'); console.log(`%c"${s.m}"`, 'color: #ffd700; font-style: italic;'); }}
+        }
+        function unlockLoreAchievement(id) {
+            if (loreState.achievements.has(id)) return;
+            const a = LORE.achievements[id]; if (!a) return;
+            loreState.achievements.add(id);
+            console.log('%c\n★ ACHIEVEMENT UNLOCKED ★', 'color: #ffd700; font-size: 16px; font-weight: bold;');
+            console.log(`%c${a.t}`, 'color: #ffd700; font-size: 14px;');
+            console.log(`%c"${a.l}"`, 'color: #ffd700; font-style: italic;');
+            let el = document.getElementById('achOverlay');
+            if (!el) { el = document.createElement('div'); el.id = 'achOverlay'; el.style.cssText = 'position:fixed;top:20%;left:50%;transform:translateX(-50%);font-size:18px;color:#ffd700;text-shadow:0 0 20px #ffd700;opacity:0;pointer-events:none;z-index:2001;text-align:center;transition:opacity 0.5s;'; document.body.appendChild(el); }
+            el.innerHTML = `<div style="font-size:24px;">★</div><div>${a.t}</div>`; el.style.opacity = '1';
+            setTimeout(() => { el.style.opacity = '0'; }, 3000);
+        }
+        function showRevelation() { if (loreState.revealed) return; loreState.revealed = true; console.log('\n'); LORE.endgame.finalRevelation.forEach(l => console.log(`%c${l}`, 'color: #ffd700; font-family: monospace;')); console.log('\n'); }
+        function showAncientText() { const t = LORE.prophecies.ancientTexts[Math.floor(Math.random()*LORE.prophecies.ancientTexts.length)]; console.log(`%c\n📜 ${t}\n`, 'color: #8b4513; font-style: italic;'); }
+        function getProphecy(type='imminent') { return LORE.prophecies[type][Math.floor(Math.random()*LORE.prophecies[type].length)]; }
+        function showAllLore() {
+            console.log('%c\n╔═══════════════════════════════════════════╗', 'color: #8b00ff;');
+            console.log('%c║      DISCOVERED LORE FRAGMENTS           ║', 'color: #8b00ff; font-weight: bold;');
+            console.log('%c╚═══════════════════════════════════════════╝', 'color: #8b00ff;');
+            if (loreState.discovered.size === 0) console.log('%cNo fragments yet. Keep watching...', 'color: #888;');
+            else loreState.discovered.forEach(f => console.log(`%c• ${f}`, 'color: #ffd700;'));
+            console.log('%c\n═══ ACHIEVEMENTS ═══', 'color: #ffd700; font-weight: bold;');
+            Object.entries(LORE.achievements).forEach(([k,v]) => { if (loreState.achievements.has(k)) console.log(`%c★ ${v.t}`, 'color: #ffd700;'); });
+            console.log('%c\n═══ CORNERS ═══', 'color: #00ffff; font-weight: bold;');
+            Object.entries(loreState.corners).forEach(([k,v]) => { const c = LORE.corners[k]; console.log(`%c${c.name}: ${v}`, `color: ${v>0?'#00ffff':'#555'};`); });
+        }
+
         // ============================================
         // ULTIMATE DVD LOGO - CONFIGURATION
         // ============================================
@@ -390,6 +1078,157 @@
         const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
         // ============================================
+        // POWER LEVEL SYSTEM - SAIYAN TRANSFORMATIONS
+        // ============================================
+
+        // Power Level Configuration
+        const POWER_CONFIG = {
+            // Power gain rates
+            cornerHitPower: 5000,           // MASSIVE power from corner hit
+            edgeHitPower: 100,              // Small power from edge hit
+            nearMissPower: 50,              // Power from near-miss (close to corner)
+            prophecyPower: 25,              // Power per frame during prophecy
+            passivePowerRate: 5,            // Passive power gain per second
+            streakMultiplier: 1.5,          // Power multiplier per streak
+
+            // Power decay rates
+            decayRate: 50,                  // Power lost per second at high levels
+            decayStartThreshold: 50000,     // Start decaying above this
+            transformationDecayMultiplier: { // Higher forms decay faster
+                base: 0,
+                superDvd: 1,
+                superDvd2: 2,
+                superDvd3: 4,
+                ultraInstinct: 3,
+                legendary: 0,  // Legendary is stable but VERY hard to reach
+                omniDvd: 0     // OMNI is eternal once achieved
+            },
+
+            // Transformation thresholds (IT'S OVER 9000!)
+            thresholds: {
+                superDvd: 9001,             // Super DVD (SSJ1) - It's over 9000!
+                superDvd2: 50000,           // Super DVD 2 (SSJ2)
+                superDvd3: 150000,          // Super DVD 3 (SSJ3) - The legendary form
+                ultraInstinct: 500000,      // Ultra Instinct - Beyond Saiyan
+                legendary: 1000000,         // Legendary Super DVD - The ultimate
+                omniDvd: 5000000            // OMNI DVD - THE SECRET ULTIMATE FORM
+            },
+
+            // Maximum power
+            maxPower: 9999999,
+
+            // Transformation lock duration (prevents rapid switching)
+            transformationCooldown: 3000,   // 3 seconds between transformations
+
+            // Corner hit grants temporary power lock (no decay)
+            cornerPowerLockDuration: 5000,  // 5 seconds of no decay after corner
+        };
+
+        // Power Level State
+        let powerLevel = 0;
+        let currentTransformation = 'base';
+        let lastTransformationTime = 0;
+        let powerLockUntil = 0;           // No decay until this timestamp
+        let isTransforming = false;        // Animation lock
+        let showPowerScouter = true;
+        let peakPowerLevel = 0;            // Track highest power achieved
+        let transformationHistory = [];     // Track transformation events
+
+        // Transformation definitions
+        const TRANSFORMATIONS = {
+            base: {
+                name: 'BASE FORM',
+                threshold: 0,
+                color: '#ffffff',
+                auraClass: 'aura-base',
+                logoClass: '',
+                scouterClass: 'base',
+                speedMultiplier: 1,
+                announcement: null,
+                groundShake: false,
+                audioFreqBase: 0
+            },
+            superDvd: {
+                name: 'SUPER DVD',
+                threshold: POWER_CONFIG.thresholds.superDvd,
+                color: '#ffd700',
+                auraClass: 'aura-super',
+                logoClass: 'super-dvd',
+                scouterClass: 'super-dvd',
+                speedMultiplier: 1.2,
+                announcement: 'SUPER DVD!',
+                groundShake: false,
+                audioFreqBase: 200
+            },
+            superDvd2: {
+                name: 'SUPER DVD 2',
+                threshold: POWER_CONFIG.thresholds.superDvd2,
+                color: '#00bfff',
+                auraClass: 'aura-super2',
+                logoClass: 'super-dvd-2',
+                scouterClass: 'super-dvd-2',
+                speedMultiplier: 1.4,
+                announcement: 'SUPER DVD 2!!',
+                groundShake: false,
+                audioFreqBase: 300
+            },
+            superDvd3: {
+                name: 'SUPER DVD 3',
+                threshold: POWER_CONFIG.thresholds.superDvd3,
+                color: '#ff4500',
+                auraClass: 'aura-super3',
+                logoClass: 'super-dvd-3',
+                scouterClass: 'super-dvd-3',
+                speedMultiplier: 1.6,
+                announcement: 'SUPER DVD 3!!!',
+                groundShake: true,  // THE GROUND SHAKES
+                audioFreqBase: 400
+            },
+            ultraInstinct: {
+                name: 'ULTRA INSTINCT',
+                threshold: POWER_CONFIG.thresholds.ultraInstinct,
+                color: '#c0c0ff',
+                auraClass: 'aura-ultra',
+                logoClass: 'ultra-instinct',
+                scouterClass: 'ultra-instinct',
+                speedMultiplier: 1.3, // Calm, controlled speed
+                announcement: 'ULTRA INSTINCT...',
+                groundShake: false,
+                audioFreqBase: 600
+            },
+            legendary: {
+                name: 'LEGENDARY SUPER DVD',
+                threshold: POWER_CONFIG.thresholds.legendary,
+                color: '#00ff00',
+                auraClass: 'aura-legendary',
+                logoClass: 'legendary',
+                scouterClass: 'legendary',
+                speedMultiplier: 2.0, // MAXIMUM POWER
+                announcement: 'LEGENDARY SUPER DVD!!!!',
+                groundShake: true,
+                audioFreqBase: 100  // Deep, rumbling
+            },
+            omniDvd: {
+                name: 'OMNI DVD',
+                threshold: POWER_CONFIG.thresholds.omniDvd,
+                color: '#ff00ff',
+                auraClass: 'aura-omni',
+                logoClass: 'omni-dvd',
+                scouterClass: 'omni-dvd',
+                speedMultiplier: 2.5, // TRANSCENDENT SPEED
+                announcement: '>>> OMNI DVD <<<',
+                groundShake: true,
+                realityDistortion: true, // Special effect
+                audioFreqBase: 50  // Ultra-deep, reality-warping
+            }
+        };
+
+        // Power Level DOM Elements
+        let powerValueEl, powerBarEl, scouterFrameEl, transformNameEl;
+        let transformFlashEl, chargingOverlayEl, transformAnnounceEl, decayWarningEl;
+        let auraContainerEl, powerScouterEl;
+
+        // ============================================
         // DOM ELEMENTS
         // ============================================
         const logo = document.getElementById('dvdLogo');
@@ -434,6 +1273,9 @@
             // Initialize audio context on first interaction
             document.addEventListener('click', initAudio, { once: true });
             document.addEventListener('keydown', initAudio, { once: true });
+
+            // Initialize lore system
+            initLore();
         }
 
         // ============================================
@@ -501,6 +1343,511 @@
 
             droneGain.gain.linearRampToValueAtTime(targetGain, audioContext.currentTime + 0.1);
             droneOscillator.frequency.linearRampToValueAtTime(targetFreq, audioContext.currentTime + 0.1);
+        }
+
+        // ============================================
+        // POWER LEVEL AUDIO SYSTEM
+        // ============================================
+
+        let transformationOscillators = [];
+
+        function playTransformationSound(transformation) {
+            if (!audioContext || !CONFIG.sound) return;
+
+            const trans = TRANSFORMATIONS[transformation];
+            if (!trans || trans.audioFreqBase === 0) return;
+
+            // Clear any existing transformation sounds
+            transformationOscillators.forEach(osc => {
+                try { osc.stop(); } catch(e) {}
+            });
+            transformationOscillators = [];
+
+            // Create dramatic ascending transformation sound
+            const duration = transformation === 'legendary' ? 3 : 2;
+            const baseFreq = trans.audioFreqBase;
+
+            // Main transformation tone
+            const osc1 = audioContext.createOscillator();
+            const gain1 = audioContext.createGain();
+            osc1.type = 'sawtooth';
+            osc1.frequency.setValueAtTime(baseFreq * 0.5, audioContext.currentTime);
+            osc1.frequency.exponentialRampToValueAtTime(baseFreq * 2, audioContext.currentTime + duration * 0.7);
+            gain1.gain.setValueAtTime(0, audioContext.currentTime);
+            gain1.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.3);
+            gain1.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + duration * 0.5);
+            gain1.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+            osc1.connect(gain1);
+            gain1.connect(audioContext.destination);
+            osc1.start();
+            osc1.stop(audioContext.currentTime + duration);
+            transformationOscillators.push(osc1);
+
+            // Harmonic layer
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(baseFreq, audioContext.currentTime);
+            osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3, audioContext.currentTime + duration * 0.8);
+            gain2.gain.setValueAtTime(0, audioContext.currentTime);
+            gain2.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.5);
+            gain2.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.start();
+            osc2.stop(audioContext.currentTime + duration);
+            transformationOscillators.push(osc2);
+
+            // SSJ3 and Legendary get extra dramatic elements
+            if (transformation === 'superDvd3' || transformation === 'legendary') {
+                // Low rumble
+                const osc3 = audioContext.createOscillator();
+                const gain3 = audioContext.createGain();
+                osc3.type = 'sine';
+                osc3.frequency.value = 40;
+                gain3.gain.setValueAtTime(0, audioContext.currentTime);
+                gain3.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.5);
+                gain3.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + duration * 0.8);
+                gain3.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+                osc3.connect(gain3);
+                gain3.connect(audioContext.destination);
+                osc3.start();
+                osc3.stop(audioContext.currentTime + duration);
+                transformationOscillators.push(osc3);
+            }
+
+            // Ultra Instinct gets ethereal sound
+            if (transformation === 'ultraInstinct') {
+                const osc4 = audioContext.createOscillator();
+                const gain4 = audioContext.createGain();
+                const filter = audioContext.createBiquadFilter();
+                filter.type = 'highpass';
+                filter.frequency.value = 800;
+                osc4.type = 'sine';
+                osc4.frequency.setValueAtTime(800, audioContext.currentTime);
+                osc4.frequency.linearRampToValueAtTime(1200, audioContext.currentTime + duration);
+                gain4.gain.setValueAtTime(0, audioContext.currentTime);
+                gain4.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 1);
+                gain4.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+                osc4.connect(filter);
+                filter.connect(gain4);
+                gain4.connect(audioContext.destination);
+                osc4.start();
+                osc4.stop(audioContext.currentTime + duration);
+                transformationOscillators.push(osc4);
+            }
+
+            // OMNI DVD - Reality-warping sound
+            if (transformation === 'omniDvd') {
+                const omniDuration = 4;
+
+                // Ultra-deep bass
+                const bassOsc = audioContext.createOscillator();
+                const bassGain = audioContext.createGain();
+                bassOsc.type = 'sine';
+                bassOsc.frequency.value = 25;
+                bassGain.gain.setValueAtTime(0, audioContext.currentTime);
+                bassGain.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 1);
+                bassGain.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + omniDuration);
+                bassOsc.connect(bassGain);
+                bassGain.connect(audioContext.destination);
+                bassOsc.start();
+                bassOsc.stop(audioContext.currentTime + omniDuration);
+                transformationOscillators.push(bassOsc);
+
+                // Ascending harmonic series
+                for (let i = 0; i < 5; i++) {
+                    const harmOsc = audioContext.createOscillator();
+                    const harmGain = audioContext.createGain();
+                    harmOsc.type = 'sine';
+                    harmOsc.frequency.setValueAtTime(100 * (i + 1), audioContext.currentTime + i * 0.5);
+                    harmOsc.frequency.exponentialRampToValueAtTime(200 * (i + 1), audioContext.currentTime + omniDuration);
+                    harmGain.gain.setValueAtTime(0, audioContext.currentTime + i * 0.5);
+                    harmGain.gain.linearRampToValueAtTime(0.1 / (i + 1), audioContext.currentTime + i * 0.5 + 0.3);
+                    harmGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + omniDuration);
+                    harmOsc.connect(harmGain);
+                    harmGain.connect(audioContext.destination);
+                    harmOsc.start(audioContext.currentTime + i * 0.5);
+                    harmOsc.stop(audioContext.currentTime + omniDuration);
+                    transformationOscillators.push(harmOsc);
+                }
+
+                // High shimmer
+                const shimmerOsc = audioContext.createOscillator();
+                const shimmerGain = audioContext.createGain();
+                shimmerOsc.type = 'sine';
+                shimmerOsc.frequency.setValueAtTime(2000, audioContext.currentTime + 2);
+                shimmerOsc.frequency.linearRampToValueAtTime(4000, audioContext.currentTime + omniDuration);
+                shimmerGain.gain.setValueAtTime(0, audioContext.currentTime + 2);
+                shimmerGain.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 3);
+                shimmerGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + omniDuration);
+                shimmerOsc.connect(shimmerGain);
+                shimmerGain.connect(audioContext.destination);
+                shimmerOsc.start(audioContext.currentTime + 2);
+                shimmerOsc.stop(audioContext.currentTime + omniDuration);
+                transformationOscillators.push(shimmerOsc);
+            }
+        }
+
+        function playPowerUpTick() {
+            if (!audioContext || !CONFIG.sound) return;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 400 + (powerLevel / POWER_CONFIG.maxPower) * 600;
+            gain.gain.setValueAtTime(0.03, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.05);
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.05);
+        }
+
+        function playPowerDecaySound() {
+            if (!audioContext || !CONFIG.sound) return;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.05, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.3);
+        }
+
+        // ============================================
+        // POWER LEVEL SYSTEM FUNCTIONS
+        // ============================================
+
+        function initPowerLevelSystem() {
+            // Get DOM elements
+            powerValueEl = document.getElementById('powerValue');
+            powerBarEl = document.getElementById('powerBar');
+            scouterFrameEl = document.getElementById('scouterFrame');
+            transformNameEl = document.getElementById('transformationName');
+            transformFlashEl = document.getElementById('transformFlash');
+            chargingOverlayEl = document.getElementById('chargingOverlay');
+            transformAnnounceEl = document.getElementById('transformAnnounce');
+            decayWarningEl = document.getElementById('decayWarning');
+            auraContainerEl = document.getElementById('auraContainer');
+            powerScouterEl = document.getElementById('powerScouter');
+
+            // Initial display update
+            updatePowerDisplay();
+
+            // Start passive power gain and decay loop
+            setInterval(processPowerTick, 1000 / 60); // 60 FPS
+
+            console.log('%cPOWER LEVEL SYSTEM INITIALIZED', 'color: #ffd700; font-weight: bold;');
+            console.log('%cThresholds:', 'color: #00ff88;');
+            console.log('  Super DVD:      9,001 (IT\'S OVER 9000!)');
+            console.log('  Super DVD 2:    50,000');
+            console.log('  Super DVD 3:    150,000 (GROUND SHAKES!)');
+            console.log('  Ultra Instinct: 500,000');
+            console.log('  LEGENDARY:      1,000,000');
+        }
+
+        function addPower(amount, source = 'unknown') {
+            const multiplier = 1 + (currentStreak * 0.1); // Streak bonus
+            const adjustedAmount = Math.floor(amount * multiplier);
+
+            const oldPower = powerLevel;
+            powerLevel = Math.min(powerLevel + adjustedAmount, POWER_CONFIG.maxPower);
+
+            // Track peak
+            if (powerLevel > peakPowerLevel) {
+                peakPowerLevel = powerLevel;
+            }
+
+            // Check for transformation
+            checkTransformation();
+
+            // Update display
+            updatePowerDisplay();
+
+            // Sound effect for significant gains
+            if (adjustedAmount > 500) {
+                playPowerUpTick();
+            }
+
+            // Log significant power gains
+            if (adjustedAmount >= 1000) {
+                console.log(`%cPOWER +${adjustedAmount.toLocaleString()} (${source})`, 'color: #ffd700;');
+            }
+        }
+
+        function removePower(amount) {
+            const oldPower = powerLevel;
+            powerLevel = Math.max(0, powerLevel - amount);
+
+            // Check for de-transformation
+            checkTransformation();
+
+            // Update display
+            updatePowerDisplay();
+        }
+
+        function processPowerTick() {
+            const now = Date.now();
+
+            // Passive power gain (very slow)
+            if (powerLevel < POWER_CONFIG.thresholds.superDvd) {
+                powerLevel += POWER_CONFIG.passivePowerRate / 60;
+            }
+
+            // Power decay for high power levels
+            if (powerLevel > POWER_CONFIG.decayStartThreshold && now > powerLockUntil) {
+                const decayMultiplier = POWER_CONFIG.transformationDecayMultiplier[currentTransformation] || 1;
+                const decayAmount = (POWER_CONFIG.decayRate * decayMultiplier) / 60;
+
+                if (decayAmount > 0) {
+                    powerLevel = Math.max(0, powerLevel - decayAmount);
+
+                    // Show decay warning
+                    if (currentTransformation !== 'base' && currentTransformation !== 'superDvd') {
+                        decayWarningEl.classList.add('active');
+                    }
+                }
+            } else {
+                decayWarningEl.classList.remove('active');
+            }
+
+            // Check transformation on decay
+            checkTransformation();
+
+            // Update display
+            updatePowerDisplay();
+        }
+
+        function checkTransformation() {
+            if (isTransforming) return;
+
+            const now = Date.now();
+            if (now - lastTransformationTime < POWER_CONFIG.transformationCooldown) return;
+
+            let newTransformation = 'base';
+
+            // Check thresholds from highest to lowest
+            if (powerLevel >= POWER_CONFIG.thresholds.omniDvd) {
+                newTransformation = 'omniDvd';  // SECRET ULTIMATE FORM
+            } else if (powerLevel >= POWER_CONFIG.thresholds.legendary) {
+                newTransformation = 'legendary';
+            } else if (powerLevel >= POWER_CONFIG.thresholds.ultraInstinct) {
+                newTransformation = 'ultraInstinct';
+            } else if (powerLevel >= POWER_CONFIG.thresholds.superDvd3) {
+                newTransformation = 'superDvd3';
+            } else if (powerLevel >= POWER_CONFIG.thresholds.superDvd2) {
+                newTransformation = 'superDvd2';
+            } else if (powerLevel >= POWER_CONFIG.thresholds.superDvd) {
+                newTransformation = 'superDvd';
+            }
+
+            if (newTransformation !== currentTransformation) {
+                triggerTransformation(newTransformation);
+            }
+        }
+
+        function triggerTransformation(newTransformation) {
+            const oldTransformation = currentTransformation;
+            const isAscending = getTransformationTier(newTransformation) > getTransformationTier(oldTransformation);
+
+            isTransforming = true;
+            lastTransformationTime = Date.now();
+
+            const trans = TRANSFORMATIONS[newTransformation];
+
+            // Only show dramatic effects when powering UP
+            if (isAscending && trans.announcement) {
+                // Flash effect
+                transformFlashEl.classList.add('active');
+                setTimeout(() => transformFlashEl.classList.remove('active'), 1000);
+
+                // Announcement
+                transformAnnounceEl.textContent = trans.announcement;
+                transformAnnounceEl.style.color = trans.color;
+                transformAnnounceEl.classList.add('active');
+                setTimeout(() => transformAnnounceEl.classList.remove('active'), 2000);
+
+                // Lore achievements for transformations
+                if (newTransformation === 'superDvd') unlockLoreAchievement('over_9000');
+                if (newTransformation === 'superDvd3') unlockLoreAchievement('ssj3');
+                showLoreFragment('transformation');
+
+                // Create celebration fireworks for transformation
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        createFireworks(
+                            Math.random() * window.innerWidth,
+                            Math.random() * window.innerHeight
+                        );
+                    }, i * 300);
+                }
+
+                // Play transformation sound
+                playTransformationSound(newTransformation);
+
+                // Screen shake for dramatic transformations
+                if (trans.groundShake && CONFIG.shake) {
+                    document.body.classList.add('ground-shake');
+                    setTimeout(() => document.body.classList.remove('ground-shake'), 2000);
+                }
+
+                // Log to console
+                console.log(`%c${'='.repeat(40)}`, `color: ${trans.color};`);
+                console.log(`%cTRANSFORMATION: ${trans.name}`, `color: ${trans.color}; font-size: 20px; font-weight: bold;`);
+                console.log(`%cPower Level: ${Math.floor(powerLevel).toLocaleString()}`, `color: ${trans.color};`);
+                console.log(`%c${'='.repeat(40)}`, `color: ${trans.color};`);
+            }
+
+            // Update current transformation
+            currentTransformation = newTransformation;
+
+            // Apply visual changes
+            applyTransformationVisuals(newTransformation);
+
+            // Track history
+            transformationHistory.push({
+                transformation: newTransformation,
+                powerLevel: powerLevel,
+                timestamp: Date.now()
+            });
+
+            // End transformation lock after effects
+            setTimeout(() => {
+                isTransforming = false;
+            }, isAscending ? 2000 : 500);
+        }
+
+        function getTransformationTier(transformation) {
+            const tiers = {
+                'base': 0,
+                'superDvd': 1,
+                'superDvd2': 2,
+                'superDvd3': 3,
+                'ultraInstinct': 4,
+                'legendary': 5,
+                'omniDvd': 6  // THE ULTIMATE TIER
+            };
+            return tiers[transformation] || 0;
+        }
+
+        function applyTransformationVisuals(transformation) {
+            const trans = TRANSFORMATIONS[transformation];
+            const realityDistortionEl = document.getElementById('realityDistortion');
+
+            // Update logo classes
+            logo.classList.remove('super-dvd', 'super-dvd-2', 'super-dvd-3', 'ultra-instinct', 'legendary', 'omni-dvd');
+            if (trans.logoClass) {
+                logo.classList.add(trans.logoClass);
+            }
+
+            // Update aura
+            updateAura(transformation);
+
+            // Update scouter display
+            scouterFrameEl.className = `scouter-frame ${trans.scouterClass}`;
+            transformNameEl.textContent = trans.name;
+
+            // Apply speed multiplier
+            const baseSpeed = CONFIG.baseSpeed;
+            const newSpeed = baseSpeed * trans.speedMultiplier;
+            dx = (dx > 0 ? 1 : -1) * newSpeed;
+            dy = (dy > 0 ? 1 : -1) * newSpeed;
+
+            // Ground shake for SSJ3, Legendary, and OMNI
+            if (trans.groundShake) {
+                document.body.classList.add('ground-shake');
+            } else {
+                document.body.classList.remove('ground-shake');
+            }
+
+            // Reality distortion for OMNI DVD
+            if (trans.realityDistortion && realityDistortionEl) {
+                realityDistortionEl.classList.add('active');
+            } else if (realityDistortionEl) {
+                realityDistortionEl.classList.remove('active');
+            }
+        }
+
+        function updateAura(transformation) {
+            const trans = TRANSFORMATIONS[transformation];
+
+            // Clear existing aura
+            auraContainerEl.innerHTML = '';
+            auraContainerEl.className = 'aura-container';
+
+            if (transformation !== 'base') {
+                const aura = document.createElement('div');
+                aura.className = trans.auraClass;
+                auraContainerEl.appendChild(aura);
+
+                // Add energy particles for higher forms
+                if (getTransformationTier(transformation) >= 2) {
+                    spawnEnergyParticles(transformation);
+                }
+            }
+        }
+
+        function spawnEnergyParticles(transformation) {
+            const trans = TRANSFORMATIONS[transformation];
+            const particleCount = getTransformationTier(transformation) * 3;
+
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'energy-particle';
+                particle.style.background = trans.color;
+                particle.style.boxShadow = `0 0 10px ${trans.color}`;
+
+                // Random position around the aura
+                const angle = (i / particleCount) * Math.PI * 2;
+                const radius = 60 + Math.random() * 40;
+                particle.style.left = `${50 + Math.cos(angle) * radius}%`;
+                particle.style.top = `${50 + Math.sin(angle) * radius}%`;
+
+                // Animation
+                particle.style.animation = `energyOrbit ${2 + Math.random()}s linear infinite`;
+
+                auraContainerEl.appendChild(particle);
+            }
+        }
+
+        function updatePowerDisplay() {
+            if (!powerValueEl) return;
+
+            // Update power value with animation
+            const displayValue = Math.floor(powerLevel);
+            powerValueEl.textContent = displayValue.toLocaleString();
+
+            // Update power bar (percentage to next transformation)
+            const currentThreshold = TRANSFORMATIONS[currentTransformation].threshold;
+            const nextThreshold = getNextThreshold();
+
+            if (nextThreshold) {
+                const progress = ((powerLevel - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+                powerBarEl.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+            } else {
+                powerBarEl.style.width = '100%';
+            }
+
+            // Update scouter visibility
+            powerScouterEl.style.display = showPowerScouter ? 'block' : 'none';
+        }
+
+        function getNextThreshold() {
+            const thresholds = Object.values(POWER_CONFIG.thresholds).sort((a, b) => a - b);
+            for (const threshold of thresholds) {
+                if (threshold > powerLevel) return threshold;
+            }
+            return null;
+        }
+
+        function lockPowerDecay(duration) {
+            powerLockUntil = Date.now() + duration;
         }
 
         // ============================================
@@ -597,9 +1944,26 @@
             // Show prophecy indicator when very close
             if (proximity > 0.85) {
                 prophecyEl.classList.add('active');
+                // Dynamic prophecy text from lore system
+                if (Math.random() < 0.05) {
+                    const prophecyText = getProphecy('imminent');
+                    prophecyEl.innerHTML = prophecyText + '<br><span style="font-size: 14px;">The corner approaches...</span>';
+                }
+
+                // ========== POWER LEVEL SYSTEM ==========
+                // Gain power during prophecy (tension building!)
+                addPower(POWER_CONFIG.prophecyPower, 'prophecy');
+                // ========================================
             } else {
                 prophecyEl.classList.remove('active');
             }
+
+            // ========== POWER LEVEL SYSTEM ==========
+            // Near-miss power (proximity > 0.5 means reasonably close)
+            if (proximity > 0.5 && proximity < 0.85) {
+                addPower(POWER_CONFIG.nearMissPower * proximity, 'near-miss');
+            }
+            // ========================================
 
             return proximity;
         }
@@ -614,6 +1978,10 @@
 
             if (hours === 3 && minutes < 15) {
                 document.body.classList.add('midnight-mode');
+                // Lore achievement for midnight witness
+                unlockLoreAchievement('midnight_witness');
+                // Midnight lore fragment chance
+                if (Math.random() < 0.05) showLoreFragment('midnight');
                 // Occasionally reverse direction (spooky!)
                 if (Math.random() < 0.001) {
                     dx = -dx;
@@ -669,6 +2037,9 @@
             konamiActive = true;
             console.log('🎮 KONAMI CODE ACTIVATED! Rainbow mode for 30 seconds!');
 
+            // Lore achievement
+            unlockLoreAchievement('konami_master');
+
             // Rainbow cycling mode
             const originalColors = [...CONFIG.colors];
             CONFIG.colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
@@ -720,6 +2091,27 @@
             droughtCounter = 0;
             droughtEl.textContent = '0 bounces';
 
+            // ========== POWER LEVEL SYSTEM ==========
+            // MASSIVE power gain from corner hit!
+            const streakBonus = Math.pow(POWER_CONFIG.streakMultiplier, currentStreak - 1);
+            const powerGain = Math.floor(POWER_CONFIG.cornerHitPower * streakBonus);
+            addPower(powerGain, `CORNER HIT x${currentStreak}`);
+
+            // Lock power decay after corner hit
+            lockPowerDecay(POWER_CONFIG.cornerPowerLockDuration);
+
+            // Extra fireworks based on transformation tier
+            const extraFireworks = getTransformationTier(currentTransformation);
+            for (let i = 0; i < extraFireworks; i++) {
+                setTimeout(() => {
+                    createFireworks(
+                        Math.random() * window.innerWidth,
+                        Math.random() * window.innerHeight
+                    );
+                }, i * 200);
+            }
+            // ========================================
+
             // Visual celebration
             logo.classList.add('corner-hit');
             setTimeout(() => logo.classList.remove('corner-hit'), 500);
@@ -745,7 +2137,13 @@
             // Check for Rick Roll on corner hit
             checkRickRoll();
 
-            console.log('🎉 CORNER HIT! Total:', cornerHits, '| Streak:', currentStreak);
+            // ========== LORE SYSTEM ==========
+            checkCornerLore();
+            checkLoreMilestones(cornerHits);
+            if (currentStreak >= 3) showLoreFragment('streak');
+            // =================================
+
+            console.log('🎉 CORNER HIT! Total:', cornerHits, '| Streak:', currentStreak, '| Power:', Math.floor(powerLevel).toLocaleString());
         }
 
         function handleEdgeHit() {
@@ -755,6 +2153,21 @@
 
             edgeHitsEl.textContent = edgeHits;
             droughtEl.textContent = `${droughtCounter} bounces`;
+
+            // ========== POWER LEVEL SYSTEM ==========
+            // Small power gain from edge hit
+            addPower(POWER_CONFIG.edgeHitPower, 'edge hit');
+            // ========================================
+
+            // ========== LORE SYSTEM ==========
+            // Random lore fragment chance on bounce
+            if (Math.random() < 0.004) showLoreFragment('random');
+            // Drought lore after 50+ bounces without corner
+            if (droughtCounter === 50) {
+                showLoreFragment('drought');
+                unlockLoreAchievement('drought_survivor');
+            }
+            // =================================
 
             nextColor();
             playEdgeTap();
@@ -796,6 +2209,14 @@
             // Apply position
             logo.style.left = x + 'px';
             logo.style.top = y + 'px';
+
+            // ========== POWER LEVEL SYSTEM ==========
+            // Position aura to follow logo
+            if (auraContainerEl) {
+                auraContainerEl.style.left = (x + logoWidth / 2) + 'px';
+                auraContainerEl.style.top = (y + logoHeight / 2) + 'px';
+            }
+            // ========================================
 
             // Update particles
             updateParticles();
@@ -899,6 +2320,44 @@
                     // Test fireworks
                     createFireworks(window.innerWidth/2, window.innerHeight/2);
                     break;
+                case 'p':
+                    // Toggle power scouter display
+                    showPowerScouter = !showPowerScouter;
+                    updatePowerDisplay();
+                    console.log('Power Scouter:', showPowerScouter ? 'VISIBLE' : 'HIDDEN');
+                    break;
+                case 'l':
+                    // Show discovered lore
+                    showAllLore();
+                    break;
+                case 't':
+                    // Show ancient text
+                    showAncientText();
+                    break;
+                case '1':
+                    // Debug: Add power to test transformations
+                    addPower(10000, 'DEBUG');
+                    break;
+                case '2':
+                    // Debug: Add more power
+                    addPower(50000, 'DEBUG');
+                    break;
+                case '3':
+                    // Debug: Add massive power
+                    addPower(200000, 'DEBUG');
+                    break;
+                case '0':
+                    // Debug: Reset power
+                    powerLevel = 0;
+                    currentTransformation = 'base';
+                    applyTransformationVisuals('base');
+                    updatePowerDisplay();
+                    console.log('Power Level RESET');
+                    break;
+                case '9':
+                    // Debug: OMNI DVD (secret ultimate form)
+                    addPower(5000000, 'DEBUG - OMNI');
+                    break;
             }
         });
 
@@ -906,18 +2365,48 @@
         // START
         // ============================================
         init();
+        initPowerLevelSystem();
         animate();
 
         // Console welcome
-        console.log('%c🎬 ULTIMATE DVD LOGO - OBS Overlay', 'font-size: 20px; font-weight: bold; color: #ff00ff;');
+        console.log('%c🎬 ULTIMATE DVD LOGO - SUPER SAIYAN EDITION', 'font-size: 20px; font-weight: bold; color: #ff00ff;');
         console.log('%c════════════════════════════════════', 'color: #00ffff;');
         console.log('%cKeyboard Controls:', 'font-weight: bold;');
         console.log('  S     - Toggle stats');
+        console.log('  P     - Toggle power scouter');
         console.log('  ?     - Toggle config panel');
+        console.log('  L     - View discovered lore');
+        console.log('  T     - Read ancient texts');
         console.log('  ↑/↓   - Adjust speed');
         console.log('  C     - Change color');
         console.log('  R     - Reset stats');
         console.log('  F     - Test fireworks');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%c⚡ POWER LEVEL SYSTEM ⚡', 'font-weight: bold; color: #ffd700; font-size: 16px;');
+        console.log('%cTransformation Thresholds:', 'color: #ffd700;');
+        console.log('  🔵 Base Form:      0');
+        console.log('  🟡 Super DVD:      9,001 (IT\'S OVER 9000!)');
+        console.log('  🔷 Super DVD 2:    50,000');
+        console.log('  🔴 Super DVD 3:    150,000 (GROUND SHAKES!)');
+        console.log('  ⚪ Ultra Instinct: 500,000');
+        console.log('  🟢 LEGENDARY:      1,000,000');
+        console.log('  🌈 ???:            ???,???,??? (SECRET)');
+        console.log('%cPower Sources:', 'color: #00ff88;');
+        console.log('  Corner Hit: +5,000 (x1.5 per streak)');
+        console.log('  Edge Hit:   +100');
+        console.log('  Near-miss:  +50/frame');
+        console.log('  Prophecy:   +25/frame');
+        console.log('%cPower Decay:', 'color: #ff6b6b;');
+        console.log('  Above 50,000: Power slowly drains');
+        console.log('  Higher forms drain faster!');
+        console.log('  Corner hits lock decay for 5 seconds');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%cDebug Keys (1-3, 9, 0):', 'font-weight: bold; color: #888;');
+        console.log('  1 - Add 10,000 power');
+        console.log('  2 - Add 50,000 power');
+        console.log('  3 - Add 200,000 power');
+        console.log('  9 - ??? (find out...)');
+        console.log('  0 - Reset power level');
         console.log('%c════════════════════════════════════', 'color: #00ffff;');
         console.log('%cURL Parameters:', 'font-weight: bold;');
         console.log('  ?theme=retrowave|vaporwave|minimal|crt|classic');
@@ -933,7 +2422,7 @@
         console.log('  🌙 Midnight Mode - Active 3:00-3:15 AM');
         console.log('  🎵 Rick Roll - 0.1% chance on corner hit');
         console.log('%c════════════════════════════════════', 'color: #00ffff;');
-        console.log('%cTHE PROPHECY awaits...', 'color: #ffd700; font-style: italic;');
+        console.log('%cTHE PROPHECY awaits... POWER UP!', 'color: #ffd700; font-style: italic;');
     </script>
 </body>
 </html>
