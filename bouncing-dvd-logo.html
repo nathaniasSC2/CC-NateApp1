@@ -3,8 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bouncing DVD Logo - OBS Overlay</title>
+    <title>Bouncing DVD Logo - Ultimate Edition</title>
     <style>
+        :root {
+            /* Theme: Classic */
+            --glow-color: currentColor;
+            --glow-intensity: 0px;
+            --scanline-opacity: 0;
+            --bg-color: transparent;
+        }
+
+        /* Theme Presets */
+        .theme-classic { --glow-intensity: 0px; --scanline-opacity: 0; }
+        .theme-retrowave { --glow-intensity: 20px; --scanline-opacity: 0.15; }
+        .theme-vaporwave { --glow-intensity: 30px; --scanline-opacity: 0.1; }
+        .theme-minimal { --glow-intensity: 5px; --scanline-opacity: 0; }
+        .theme-crt { --glow-intensity: 15px; --scanline-opacity: 0.25; }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,21 +30,62 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
-            background: transparent;
-            /* For testing, uncomment the line below */
-            /* background: #1a1a2e; */
+            background: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* CRT Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: var(--scanline-opacity);
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* Fireworks Canvas */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
         }
 
         .dvd-logo {
             position: absolute;
             width: 150px;
             height: 80px;
-            transition: filter 0.1s ease;
+            transition: filter 0.3s ease;
+            filter: drop-shadow(0 0 var(--glow-intensity) var(--glow-color));
+            z-index: 100;
         }
 
         .dvd-logo svg {
             width: 100%;
             height: 100%;
+        }
+
+        /* Neon Glow Pulse Animation */
+        @keyframes glowPulse {
+            0%, 100% { filter: drop-shadow(0 0 var(--glow-intensity) var(--glow-color)); }
+            50% { filter: drop-shadow(0 0 calc(var(--glow-intensity) * 1.5) var(--glow-color)); }
+        }
+
+        .glow-enabled {
+            animation: glowPulse 2s ease-in-out infinite;
         }
 
         /* Corner hit celebration effect */
@@ -43,22 +99,72 @@
             100% { transform: scale(1); }
         }
 
-        /* Stats overlay (optional - can be hidden for clean look) */
+        /* Screen Shake */
+        @keyframes screenShake {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5px, -5px); }
+            20% { transform: translate(5px, -5px); }
+            30% { transform: translate(-5px, 5px); }
+            40% { transform: translate(5px, 5px); }
+            50% { transform: translate(-3px, -3px); }
+            60% { transform: translate(3px, -3px); }
+            70% { transform: translate(-3px, 3px); }
+            80% { transform: translate(3px, 3px); }
+            90% { transform: translate(-1px, -1px); }
+        }
+
+        .screen-shake {
+            animation: screenShake 0.4s ease-out;
+        }
+
+        /* The Prophecy indicator */
+        .prophecy-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            text-shadow: 0 0 20px #ffd700, 0 0 40px #ffd700;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1001;
+            transition: opacity 0.3s ease;
+            text-align: center;
+        }
+
+        .prophecy-indicator.active {
+            opacity: 1;
+            animation: prophecyPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes prophecyPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        /* Stats overlay */
         .stats {
             position: fixed;
             top: 10px;
             right: 10px;
             color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-size: 14px;
             background: rgba(0, 0, 0, 0.7);
-            padding: 10px 15px;
+            padding: 15px 20px;
             border-radius: 8px;
-            display: none; /* Set to 'block' to show stats */
+            display: none;
+            z-index: 1002;
+            min-width: 200px;
         }
 
-        .stats.visible {
-            display: block;
+        .stats.visible { display: block; }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
         }
 
         .corner-count {
@@ -66,57 +172,204 @@
             font-weight: bold;
             font-size: 18px;
         }
+
+        .streak-display {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .drought-counter {
+            color: #ff6b6b;
+        }
+
+        .streak-counter {
+            color: #4ecdc4;
+        }
+
+        /* Midnight Mode */
+        .midnight-mode .dvd-logo {
+            filter: drop-shadow(0 0 30px #8b00ff) drop-shadow(0 0 60px #4b0082);
+        }
+
+        .midnight-mode .scanlines {
+            opacity: 0.3;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(75, 0, 130, 0.2),
+                rgba(75, 0, 130, 0.2) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+        }
+
+        /* Config Panel */
+        .config-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            font-size: 12px;
+            z-index: 1003;
+            display: none;
+            max-width: 300px;
+        }
+
+        .config-panel.visible { display: block; }
+
+        .config-panel h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .config-row {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .config-panel select, .config-panel input {
+            background: #333;
+            color: white;
+            border: 1px solid #555;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        /* Help overlay */
+        .help-overlay {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            z-index: 1001;
+        }
     </style>
 </head>
-<body>
-    <div class="dvd-logo" id="dvdLogo">
+<body class="theme-retrowave">
+    <!-- CRT Scanlines -->
+    <div class="scanlines"></div>
+
+    <!-- Fireworks Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- The Prophecy Indicator -->
+    <div class="prophecy-indicator" id="prophecy">
+        THE PROPHECY<br>
+        <span style="font-size: 16px;">Corner imminent...</span>
+    </div>
+
+    <!-- DVD Logo -->
+    <div class="dvd-logo glow-enabled" id="dvdLogo">
         <svg viewBox="0 0 210 108" xmlns="http://www.w3.org/2000/svg">
-            <!-- DVD Logo SVG -->
             <g id="logoGroup" fill="currentColor">
-                <!-- D -->
                 <path d="M20 20h25c20 0 35 15 35 34s-15 34-35 34H20V20zm15 12v44h10c12 0 20-10 20-22s-8-22-20-22H35z"/>
-                <!-- V -->
                 <path d="M90 20h15l15 50 15-50h15l-22 68h-16L90 20z"/>
-                <!-- D -->
                 <path d="M155 20h25c20 0 35 15 35 34s-15 34-35 34h-25V20zm15 12v44h10c12 0 20-10 20-22s-8-22-20-22h-10z"/>
-                <!-- Disc icon -->
                 <ellipse cx="105" cy="95" rx="25" ry="8" opacity="0.6"/>
                 <path d="M80 92c0-3 11-5 25-5s25 2 25 5v3c0 3-11 5-25 5s-25-2-25-5v-3z" opacity="0.4"/>
             </g>
         </svg>
     </div>
 
+    <!-- Stats Panel -->
     <div class="stats" id="stats">
-        <div>Edge Hits: <span id="edgeHits">0</span></div>
-        <div>Corner Hits: <span class="corner-count" id="cornerHits">0</span></div>
-        <div>Current Speed: <span id="currentSpeed">3</span></div>
+        <div class="stats-row">
+            <span>Edge Hits:</span>
+            <span id="edgeHits">0</span>
+        </div>
+        <div class="stats-row">
+            <span>Corner Hits:</span>
+            <span class="corner-count" id="cornerHits">0</span>
+        </div>
+        <div class="stats-row">
+            <span>Speed:</span>
+            <span id="currentSpeed">3.0</span>
+        </div>
+        <div class="streak-display">
+            <div class="stats-row">
+                <span>Drought:</span>
+                <span class="drought-counter" id="droughtCounter">0 bounces</span>
+            </div>
+            <div class="stats-row">
+                <span>Best Streak:</span>
+                <span class="streak-counter" id="bestStreak">0</span>
+            </div>
+        </div>
     </div>
 
+    <!-- Config Panel -->
+    <div class="config-panel" id="configPanel">
+        <h3>DVD Logo Config</h3>
+        <div class="config-row">
+            <label>Theme:</label>
+            <select id="themeSelect">
+                <option value="classic">Classic</option>
+                <option value="retrowave" selected>Retrowave</option>
+                <option value="vaporwave">Vaporwave</option>
+                <option value="minimal">Minimal</option>
+                <option value="crt">CRT</option>
+            </select>
+        </div>
+        <div class="config-row">
+            <label>Sound:</label>
+            <input type="checkbox" id="soundToggle" checked>
+        </div>
+        <div class="config-row">
+            <label>Tension Drone:</label>
+            <input type="checkbox" id="droneToggle" checked>
+        </div>
+        <div class="config-row">
+            <label>Screen Shake:</label>
+            <input type="checkbox" id="shakeToggle" checked>
+        </div>
+        <div class="config-row">
+            <label>Fireworks:</label>
+            <input type="checkbox" id="fireworksToggle" checked>
+        </div>
+    </div>
+
+    <!-- Help -->
+    <div class="help-overlay">Press ? for config | S for stats</div>
+
     <script>
-        // Configuration - Tweak these for your perfect setup!
+        // ============================================
+        // ULTIMATE DVD LOGO - CONFIGURATION
+        // ============================================
+
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+
         const CONFIG = {
-            // Speed settings (pixels per frame at 60fps)
-            baseSpeed: 3,
-            // Show stats overlay (press 'S' to toggle)
-            showStats: false,
-            // Color palette for the logo
+            baseSpeed: parseFloat(urlParams.get('speed')) || 3,
+            showStats: urlParams.get('stats') === 'true',
+            theme: urlParams.get('theme') || 'retrowave',
+            sound: urlParams.get('sound') !== 'false',
+            drone: urlParams.get('drone') !== 'false',
+            shake: urlParams.get('shake') !== 'false',
+            fireworks: urlParams.get('fireworks') !== 'false',
             colors: [
-                '#ff0055',  // Hot pink
-                '#00ff88',  // Neon green
-                '#00aaff',  // Electric blue
-                '#ffaa00',  // Orange
-                '#aa00ff',  // Purple
-                '#ffff00',  // Yellow
-                '#00ffff',  // Cyan
-                '#ff00ff',  // Magenta
-                '#ff6600',  // Bright orange
-                '#00ff00',  // Lime
+                '#ff0055', '#00ff88', '#00aaff', '#ffaa00', '#aa00ff',
+                '#ffff00', '#00ffff', '#ff00ff', '#ff6600', '#00ff00',
             ],
-            // Corner hit detection threshold (pixels)
-            cornerThreshold: 50,
+            // Theme-specific color palettes
+            themes: {
+                classic: ['#ff0055', '#00ff88', '#00aaff', '#ffaa00', '#aa00ff', '#ffff00'],
+                retrowave: ['#ff00ff', '#00ffff', '#ff0080', '#8000ff', '#ff8000', '#00ff80'],
+                vaporwave: ['#ff71ce', '#01cdfe', '#05ffa1', '#b967ff', '#fffb96'],
+                minimal: ['#ffffff', '#cccccc', '#999999'],
+                crt: ['#00ff00', '#33ff33', '#66ff66', '#00cc00'],
+            }
         };
 
-        // State
+        // ============================================
+        // STATE
+        // ============================================
         let x = Math.random() * (window.innerWidth - 150);
         let y = Math.random() * (window.innerHeight - 80);
         let dx = CONFIG.baseSpeed * (Math.random() > 0.5 ? 1 : -1);
@@ -124,49 +377,392 @@
         let currentColorIndex = 0;
         let edgeHits = 0;
         let cornerHits = 0;
+        let droughtCounter = 0; // Bounces since last corner
+        let bestStreak = 0;
+        let currentStreak = 0;
+        let konamiProgress = 0;
+        let konamiActive = false;
+        let audioContext = null;
+        let droneOscillator = null;
+        let droneGain = null;
 
-        // DOM Elements
+        // Konami Code: up up down down left right left right b a
+        const KONAMI_CODE = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+
+        // ============================================
+        // DOM ELEMENTS
+        // ============================================
         const logo = document.getElementById('dvdLogo');
         const logoGroup = document.getElementById('logoGroup');
         const statsEl = document.getElementById('stats');
         const edgeHitsEl = document.getElementById('edgeHits');
         const cornerHitsEl = document.getElementById('cornerHits');
         const currentSpeedEl = document.getElementById('currentSpeed');
+        const droughtEl = document.getElementById('droughtCounter');
+        const bestStreakEl = document.getElementById('bestStreak');
+        const prophecyEl = document.getElementById('prophecy');
+        const configPanel = document.getElementById('configPanel');
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // Set initial color
-        logoGroup.style.color = CONFIG.colors[currentColorIndex];
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function init() {
+            // Apply theme
+            document.body.className = `theme-${CONFIG.theme}`;
+            CONFIG.colors = CONFIG.themes[CONFIG.theme] || CONFIG.themes.classic;
 
-        // Toggle stats visibility
-        if (CONFIG.showStats) {
-            statsEl.classList.add('visible');
-        }
+            // Setup canvas
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
 
-        // Change to next color
-        function nextColor() {
-            currentColorIndex = (currentColorIndex + 1) % CONFIG.colors.length;
+            // Set initial color
             logoGroup.style.color = CONFIG.colors[currentColorIndex];
+            document.documentElement.style.setProperty('--glow-color', CONFIG.colors[currentColorIndex]);
+
+            // Show stats if configured
+            if (CONFIG.showStats) statsEl.classList.add('visible');
+
+            // Setup config panel controls
+            setupConfigPanel();
+
+            // Check for midnight mode
+            checkMidnightMode();
+            setInterval(checkMidnightMode, 60000);
+
+            // Initialize audio context on first interaction
+            document.addEventListener('click', initAudio, { once: true });
+            document.addEventListener('keydown', initAudio, { once: true });
         }
 
-        // Check if we hit a corner (both edges at once)
-        function checkCornerHit(hitX, hitY) {
-            if (hitX && hitY) {
-                cornerHits++;
-                cornerHitsEl.textContent = cornerHits;
-                logo.classList.add('corner-hit');
-                setTimeout(() => logo.classList.remove('corner-hit'), 500);
+        // ============================================
+        // AUDIO SYSTEM (Web Audio API)
+        // ============================================
+        function initAudio() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-                // Extra color changes for corner hits!
-                nextColor();
-                setTimeout(nextColor, 100);
-                setTimeout(nextColor, 200);
+            // Setup drone oscillator (but don't start it)
+            droneOscillator = audioContext.createOscillator();
+            droneGain = audioContext.createGain();
+            droneOscillator.type = 'sine';
+            droneOscillator.frequency.value = 60;
+            droneGain.gain.value = 0;
+            droneOscillator.connect(droneGain);
+            droneGain.connect(audioContext.destination);
+            droneOscillator.start();
+        }
 
-                console.log('🎉 CORNER HIT! Total:', cornerHits);
+        function playCornerChime() {
+            if (!audioContext || !CONFIG.sound) return;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioContext.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1760, audioContext.currentTime + 0.1);
+            osc.frequency.exponentialRampToValueAtTime(880, audioContext.currentTime + 0.3);
+
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.5);
+        }
+
+        function playEdgeTap() {
+            if (!audioContext || !CONFIG.sound) return;
+
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.value = 150 + Math.random() * 50;
+
+            gain.gain.setValueAtTime(0.05, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.1);
+        }
+
+        function updateTensionDrone(proximity) {
+            if (!droneGain || !CONFIG.drone) return;
+
+            // Proximity is 0-1, where 1 is very close to corner
+            const targetGain = proximity * 0.15;
+            const targetFreq = 60 + proximity * 200;
+
+            droneGain.gain.linearRampToValueAtTime(targetGain, audioContext.currentTime + 0.1);
+            droneOscillator.frequency.linearRampToValueAtTime(targetFreq, audioContext.currentTime + 0.1);
+        }
+
+        // ============================================
+        // FIREWORKS PARTICLE SYSTEM
+        // ============================================
+        let particles = [];
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.vx = (Math.random() - 0.5) * 15;
+                this.vy = (Math.random() - 0.5) * 15;
+                this.life = 1;
+                this.decay = 0.02 + Math.random() * 0.02;
+                this.size = 3 + Math.random() * 4;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.3; // Gravity
+                this.life -= this.decay;
+                this.size *= 0.98;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.life;
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function createFireworks(x, y) {
+            if (!CONFIG.fireworks) return;
+
+            const colors = CONFIG.colors;
+            for (let i = 0; i < 50; i++) {
+                particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+            }
+        }
+
+        function updateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles = particles.filter(p => p.life > 0);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+        }
+
+        // ============================================
+        // THE PROPHECY - Corner Proximity Detection
+        // ============================================
+        function calculateCornerProximity() {
+            const logoWidth = logo.offsetWidth;
+            const logoHeight = logo.offsetHeight;
+            const maxX = window.innerWidth - logoWidth;
+            const maxY = window.innerHeight - logoHeight;
+
+            // Calculate distance to each corner
+            const corners = [
+                { x: 0, y: 0 },
+                { x: maxX, y: 0 },
+                { x: 0, y: maxY },
+                { x: maxX, y: maxY }
+            ];
+
+            let minDist = Infinity;
+            corners.forEach(corner => {
+                const dist = Math.sqrt(Math.pow(x - corner.x, 2) + Math.pow(y - corner.y, 2));
+                minDist = Math.min(minDist, dist);
+            });
+
+            // Normalize to 0-1 (closer = higher)
+            const maxDist = Math.sqrt(Math.pow(maxX/2, 2) + Math.pow(maxY/2, 2));
+            return 1 - Math.min(minDist / (maxDist * 0.3), 1);
+        }
+
+        function checkProphecy() {
+            const proximity = calculateCornerProximity();
+
+            // Update tension drone
+            updateTensionDrone(proximity);
+
+            // Show prophecy indicator when very close
+            if (proximity > 0.85) {
+                prophecyEl.classList.add('active');
+            } else {
+                prophecyEl.classList.remove('active');
+            }
+
+            return proximity;
+        }
+
+        // ============================================
+        // MIDNIGHT MODE (3AM - 3:15AM)
+        // ============================================
+        function checkMidnightMode() {
+            const now = new Date();
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+
+            if (hours === 3 && minutes < 15) {
+                document.body.classList.add('midnight-mode');
+                // Occasionally reverse direction (spooky!)
+                if (Math.random() < 0.001) {
+                    dx = -dx;
+                    dy = -dy;
+                }
+            } else {
+                document.body.classList.remove('midnight-mode');
+            }
+        }
+
+        // ============================================
+        // RICK ROLL RESILIENCE (0.1% chance)
+        // ============================================
+        function checkRickRoll() {
+            if (Math.random() < 0.001) { // 0.1% chance
+                // Flash Rick Astley silhouette for 1 frame
+                logoGroup.innerHTML = `
+                    <text x="105" y="60" text-anchor="middle" font-size="40" fill="currentColor">RICK</text>
+                    <text x="105" y="90" text-anchor="middle" font-size="20" fill="currentColor">Never gonna give you up</text>
+                `;
+                setTimeout(() => {
+                    // Restore DVD logo
+                    logoGroup.innerHTML = `
+                        <path d="M20 20h25c20 0 35 15 35 34s-15 34-35 34H20V20zm15 12v44h10c12 0 20-10 20-22s-8-22-20-22H35z"/>
+                        <path d="M90 20h15l15 50 15-50h15l-22 68h-16L90 20z"/>
+                        <path d="M155 20h25c20 0 35 15 35 34s-15 34-35 34h-25V20zm15 12v44h10c12 0 20-10 20-22s-8-22-20-22h-10z"/>
+                        <ellipse cx="105" cy="95" rx="25" ry="8" opacity="0.6"/>
+                        <path d="M80 92c0-3 11-5 25-5s25 2 25 5v3c0 3-11 5-25 5s-25-2-25-5v-3z" opacity="0.4"/>
+                    `;
+                }, 500);
+                console.log('🎵 RICK ROLLED! You found the 0.1% Easter egg!');
                 return true;
             }
             return false;
         }
 
-        // Animation loop
+        // ============================================
+        // KONAMI CODE
+        // ============================================
+        function checkKonamiCode(key) {
+            if (key === KONAMI_CODE[konamiProgress]) {
+                konamiProgress++;
+                if (konamiProgress === KONAMI_CODE.length) {
+                    activateKonamiMode();
+                    konamiProgress = 0;
+                }
+            } else {
+                konamiProgress = 0;
+            }
+        }
+
+        function activateKonamiMode() {
+            konamiActive = true;
+            console.log('🎮 KONAMI CODE ACTIVATED! Rainbow mode for 30 seconds!');
+
+            // Rainbow cycling mode
+            const originalColors = [...CONFIG.colors];
+            CONFIG.colors = ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'];
+
+            // Speed boost
+            dx *= 1.5;
+            dy *= 1.5;
+
+            // Create celebration fireworks
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createFireworks(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+                }, i * 200);
+            }
+
+            setTimeout(() => {
+                konamiActive = false;
+                CONFIG.colors = originalColors;
+                dx /= 1.5;
+                dy /= 1.5;
+            }, 30000);
+        }
+
+        // ============================================
+        // COLOR MANAGEMENT
+        // ============================================
+        function nextColor() {
+            currentColorIndex = (currentColorIndex + 1) % CONFIG.colors.length;
+            const newColor = CONFIG.colors[currentColorIndex];
+            logoGroup.style.color = newColor;
+            document.documentElement.style.setProperty('--glow-color', newColor);
+        }
+
+        // ============================================
+        // CORNER HIT DETECTION
+        // ============================================
+        function handleCornerHit() {
+            cornerHits++;
+            cornerHitsEl.textContent = cornerHits;
+
+            // Update streak
+            currentStreak++;
+            if (currentStreak > bestStreak) {
+                bestStreak = currentStreak;
+                bestStreakEl.textContent = bestStreak;
+            }
+
+            // Reset drought
+            droughtCounter = 0;
+            droughtEl.textContent = '0 bounces';
+
+            // Visual celebration
+            logo.classList.add('corner-hit');
+            setTimeout(() => logo.classList.remove('corner-hit'), 500);
+
+            // Screen shake
+            if (CONFIG.shake) {
+                document.body.classList.add('screen-shake');
+                setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+            }
+
+            // Fireworks!
+            const rect = logo.getBoundingClientRect();
+            createFireworks(rect.left + rect.width/2, rect.top + rect.height/2);
+
+            // Audio
+            playCornerChime();
+
+            // Color burst
+            nextColor();
+            setTimeout(nextColor, 100);
+            setTimeout(nextColor, 200);
+
+            // Check for Rick Roll on corner hit
+            checkRickRoll();
+
+            console.log('🎉 CORNER HIT! Total:', cornerHits, '| Streak:', currentStreak);
+        }
+
+        function handleEdgeHit() {
+            edgeHits++;
+            droughtCounter++;
+            currentStreak = 0; // Reset corner streak on edge hit
+
+            edgeHitsEl.textContent = edgeHits;
+            droughtEl.textContent = `${droughtCounter} bounces`;
+
+            nextColor();
+            playEdgeTap();
+        }
+
+        // ============================================
+        // MAIN ANIMATION LOOP
+        // ============================================
         function animate() {
             const logoWidth = logo.offsetWidth;
             const logoHeight = logo.offsetHeight;
@@ -177,111 +773,167 @@
             x += dx;
             y += dy;
 
-            // Track if we hit edges this frame
             let hitX = false;
             let hitY = false;
 
-            // Bounce off right or left edge
-            if (x >= maxX) {
-                x = maxX;
-                dx = -dx;
-                hitX = true;
-            } else if (x <= 0) {
-                x = 0;
-                dx = -dx;
-                hitX = true;
+            // Bounce detection
+            if (x >= maxX) { x = maxX; dx = -dx; hitX = true; }
+            else if (x <= 0) { x = 0; dx = -dx; hitX = true; }
+
+            if (y >= maxY) { y = maxY; dy = -dy; hitY = true; }
+            else if (y <= 0) { y = 0; dy = -dy; hitY = true; }
+
+            // Handle hits
+            if (hitX && hitY) {
+                handleCornerHit();
+            } else if (hitX || hitY) {
+                handleEdgeHit();
             }
 
-            // Bounce off bottom or top edge
-            if (y >= maxY) {
-                y = maxY;
-                dy = -dy;
-                hitY = true;
-            } else if (y <= 0) {
-                y = 0;
-                dy = -dy;
-                hitY = true;
-            }
-
-            // Check for corner hit first (more exciting!)
-            if (!checkCornerHit(hitX, hitY)) {
-                // Regular edge hit - just change color once
-                if (hitX || hitY) {
-                    edgeHits++;
-                    edgeHitsEl.textContent = edgeHits;
-                    nextColor();
-                }
-            }
+            // Update prophecy/tension
+            checkProphecy();
 
             // Apply position
             logo.style.left = x + 'px';
             logo.style.top = y + 'px';
 
+            // Update particles
+            updateParticles();
+
             requestAnimationFrame(animate);
         }
 
-        // Handle window resize
+        // ============================================
+        // CONFIG PANEL
+        // ============================================
+        function setupConfigPanel() {
+            document.getElementById('themeSelect').value = CONFIG.theme;
+            document.getElementById('soundToggle').checked = CONFIG.sound;
+            document.getElementById('droneToggle').checked = CONFIG.drone;
+            document.getElementById('shakeToggle').checked = CONFIG.shake;
+            document.getElementById('fireworksToggle').checked = CONFIG.fireworks;
+
+            document.getElementById('themeSelect').addEventListener('change', (e) => {
+                CONFIG.theme = e.target.value;
+                document.body.className = `theme-${CONFIG.theme}`;
+                CONFIG.colors = CONFIG.themes[CONFIG.theme] || CONFIG.themes.classic;
+            });
+
+            document.getElementById('soundToggle').addEventListener('change', (e) => {
+                CONFIG.sound = e.target.checked;
+            });
+
+            document.getElementById('droneToggle').addEventListener('change', (e) => {
+                CONFIG.drone = e.target.checked;
+                if (!CONFIG.drone && droneGain) {
+                    droneGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.1);
+                }
+            });
+
+            document.getElementById('shakeToggle').addEventListener('change', (e) => {
+                CONFIG.shake = e.target.checked;
+            });
+
+            document.getElementById('fireworksToggle').addEventListener('change', (e) => {
+                CONFIG.fireworks = e.target.checked;
+            });
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
         window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
             const maxX = window.innerWidth - logo.offsetWidth;
             const maxY = window.innerHeight - logo.offsetHeight;
-
-            // Keep logo in bounds after resize
             if (x > maxX) x = maxX;
             if (y > maxY) y = maxY;
             if (x < 0) x = 0;
             if (y < 0) y = 0;
         });
 
-        // Keyboard controls
         document.addEventListener('keydown', (e) => {
+            // Check Konami code
+            checkKonamiCode(e.key);
+
             switch(e.key.toLowerCase()) {
                 case 's':
-                    // Toggle stats
                     statsEl.classList.toggle('visible');
                     break;
-                case 'arrowup':
-                    // Increase speed
-                    dx = dx > 0 ? dx + 0.5 : dx - 0.5;
-                    dy = dy > 0 ? dy + 0.5 : dy - 0.5;
-                    currentSpeedEl.textContent = Math.abs(dx).toFixed(1);
+                case '?':
+                    configPanel.classList.toggle('visible');
                     break;
-                case 'arrowdown':
-                    // Decrease speed (minimum 1)
-                    if (Math.abs(dx) > 1) {
-                        dx = dx > 0 ? dx - 0.5 : dx + 0.5;
-                        dy = dy > 0 ? dy - 0.5 : dy + 0.5;
+                case 'arrowup':
+                    if (!KONAMI_CODE.includes(e.key) || konamiProgress === 0) {
+                        dx = dx > 0 ? dx + 0.5 : dx - 0.5;
+                        dy = dy > 0 ? dy + 0.5 : dy - 0.5;
                         currentSpeedEl.textContent = Math.abs(dx).toFixed(1);
                     }
                     break;
+                case 'arrowdown':
+                    if (!KONAMI_CODE.includes(e.key) || konamiProgress === 0) {
+                        if (Math.abs(dx) > 1) {
+                            dx = dx > 0 ? dx - 0.5 : dx + 0.5;
+                            dy = dy > 0 ? dy - 0.5 : dy + 0.5;
+                            currentSpeedEl.textContent = Math.abs(dx).toFixed(1);
+                        }
+                    }
+                    break;
                 case 'c':
-                    // Manual color change
                     nextColor();
                     break;
                 case 'r':
-                    // Reset stats
                     edgeHits = 0;
                     cornerHits = 0;
+                    droughtCounter = 0;
+                    currentStreak = 0;
+                    bestStreak = 0;
                     edgeHitsEl.textContent = '0';
                     cornerHitsEl.textContent = '0';
+                    droughtEl.textContent = '0 bounces';
+                    bestStreakEl.textContent = '0';
+                    break;
+                case 'f':
+                    // Test fireworks
+                    createFireworks(window.innerWidth/2, window.innerHeight/2);
                     break;
             }
         });
 
-        // Start the animation!
+        // ============================================
+        // START
+        // ============================================
+        init();
         animate();
 
-        // Log instructions
-        console.log('🎬 Bouncing DVD Logo - OBS Overlay');
-        console.log('================================');
-        console.log('Keyboard Controls:');
-        console.log('  S - Toggle stats display');
-        console.log('  ↑ - Increase speed');
-        console.log('  ↓ - Decrease speed');
-        console.log('  C - Change color');
-        console.log('  R - Reset stats');
-        console.log('================================');
-        console.log('For OBS: Add as Browser Source');
-        console.log('Recommended: 1920x1080, transparent bg');
+        // Console welcome
+        console.log('%c🎬 ULTIMATE DVD LOGO - OBS Overlay', 'font-size: 20px; font-weight: bold; color: #ff00ff;');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%cKeyboard Controls:', 'font-weight: bold;');
+        console.log('  S     - Toggle stats');
+        console.log('  ?     - Toggle config panel');
+        console.log('  ↑/↓   - Adjust speed');
+        console.log('  C     - Change color');
+        console.log('  R     - Reset stats');
+        console.log('  F     - Test fireworks');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%cURL Parameters:', 'font-weight: bold;');
+        console.log('  ?theme=retrowave|vaporwave|minimal|crt|classic');
+        console.log('  ?sound=true|false');
+        console.log('  ?drone=true|false');
+        console.log('  ?shake=true|false');
+        console.log('  ?fireworks=true|false');
+        console.log('  ?stats=true');
+        console.log('  ?speed=3');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%cEaster Eggs:', 'font-weight: bold; color: #ffd700;');
+        console.log('  🎮 Konami Code - ↑↑↓↓←→←→BA');
+        console.log('  🌙 Midnight Mode - Active 3:00-3:15 AM');
+        console.log('  🎵 Rick Roll - 0.1% chance on corner hit');
+        console.log('%c════════════════════════════════════', 'color: #00ffff;');
+        console.log('%cTHE PROPHECY awaits...', 'color: #ffd700; font-style: italic;');
     </script>
 </body>
 </html>
