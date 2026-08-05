@@ -4,9 +4,11 @@ import './GameDetailsPane.css';
 
 interface GameDetailsPaneProps {
   gameDetails: GameDetails | null;
+  pinnedGameIds: string[];
+  onTogglePin: (game: GameDetails) => void;
 }
 
-function GameDetailsPane({ gameDetails }: GameDetailsPaneProps) {
+function GameDetailsPane({ gameDetails, pinnedGameIds, onTogglePin }: GameDetailsPaneProps) {
   if (!gameDetails) {
     return (
       <div className="game-details-pane">
@@ -36,7 +38,20 @@ function GameDetailsPane({ gameDetails }: GameDetailsPaneProps) {
     <div className="game-details-pane">
       <div className="game-header">
         <h3>Game Details</h3>
-        {isInProgress && <span className="live-indicator">LIVE</span>}
+        <div className="game-header-actions">
+          {isInProgress && (
+            <span className="live-indicator">{gameDetails.statusDetail || 'LIVE'}</span>
+          )}
+          {!isCompleted && (
+            <button
+              className={`details-pin-btn ${pinnedGameIds.includes(gameDetails.id) ? 'pinned' : ''}`}
+              title={pinnedGameIds.includes(gameDetails.id) ? 'Unpin from desktop' : 'Pin to desktop'}
+              onClick={() => onTogglePin(gameDetails)}
+            >
+              📌 {pinnedGameIds.includes(gameDetails.id) ? 'Pinned' : 'Pin'}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="game-overview">
@@ -85,7 +100,7 @@ function GameDetailsPane({ gameDetails }: GameDetailsPaneProps) {
       </div>
 
       <div className="stats-section">
-        {isCompleted ? (
+        {isCompleted || isInProgress ? (
           <>
             {gameDetails.teamStats && gameDetails.teamStats.length > 0 && (
               <div className="team-stats">
@@ -134,14 +149,15 @@ function GameDetailsPane({ gameDetails }: GameDetailsPaneProps) {
               </div>
             ) : (
               <div className="no-stats">
-                <p>Detailed statistics not yet available</p>
+                <p>{isInProgress ? 'Live stats loading — updates every 45 seconds' : 'Detailed statistics not yet available'}</p>
               </div>
             )}
           </>
         ) : (
           <div className="awaiting-stats">
             <h4>Game Preview</h4>
-            <p>This game has not been played yet.</p>
+            <p>Awaiting stats — this game hasn't kicked off yet.</p>
+            <p className="stats-note">Pin it to your desktop and scores will appear the moment it goes live.</p>
 
             {gameDetails.seasonStats && (
               <>

@@ -8,6 +8,9 @@ export interface Team {
   alternateColor?: string;
   logo?: string;
   location: string;
+  wins?: number;
+  losses?: number;
+  ties?: number;
 }
 
 export interface Game {
@@ -22,6 +25,9 @@ export interface Game {
   homeScore: number | null;
   awayScore: number | null;
   status: string;
+  statusDetail: string | null;
+  period: number;
+  clock: string | null;
   venue: string | null;
   city: string | null;
   state: string | null;
@@ -81,13 +87,21 @@ declare global {
   interface Window {
     electronAPI: {
       syncNFLData: () => Promise<{ success: boolean; error?: string }>;
+      syncLive: () => Promise<Game[]>;
       getNextGameOverall: () => Promise<Game | null>;
       getTeamNextGame: (teamId: string) => Promise<Game | null>;
       getAllTeams: () => Promise<Team[]>;
       getTeamSchedule: (teamId: string) => Promise<Game[]>;
       getGameDetails: (gameId: string) => Promise<GameDetails | null>;
+      getGame: (gameId: string) => Promise<Game | null>;
+      getLiveGames: () => Promise<Game[]>;
       setFavoriteTeam: (teamId: string) => Promise<{ success: boolean; error?: string }>;
       getFavoriteTeam: () => Promise<string | null>;
+      pinGame: (gameId: string) => Promise<{ success: boolean }>;
+      unpinGame: (gameId: string) => Promise<{ success: boolean }>;
+      getPinnedGameIds: () => Promise<string[]>;
+      onLiveScores: (callback: (games: Game[]) => void) => () => void;
+      onPinnedChanged: (callback: (gameIds: string[]) => void) => () => void;
     };
   }
 }

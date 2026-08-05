@@ -42,6 +42,35 @@
   animation: pulse-live 1.5s ease-in-out infinite;
 }
 
+.game-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.details-pin-btn {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.details-pin-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.details-pin-btn.pinned {
+  background: rgba(74, 158, 255, 0.2);
+  border-color: rgba(74, 158, 255, 0.5);
+  color: #7cbaff;
+}
+
 .game-overview {
   margin-bottom: 24px;
 }

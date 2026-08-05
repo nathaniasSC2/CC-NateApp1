@@ -2,17 +2,25 @@
 echo Starting NFL Dashboard...
 echo.
 
-if not exist "release\win-unpacked\NFL Dashboard.exe" (
-    echo ERROR: App not found!
-    echo Please run setup-and-build.bat first to build the application.
-    echo.
-    pause
-    exit /b 1
+set "EXE="
+for %%f in ("release\NFL Dashboard*.exe") do set "EXE=%%f"
+
+if defined EXE (
+    echo Launching %EXE%...
+    start "" "%EXE%"
+    timeout /t 2 >nul
+    exit /b 0
 )
 
-echo Launching NFL Dashboard...
-start "" "release\win-unpacked\NFL Dashboard.exe"
+if exist "release\win-unpacked\NFL Dashboard.exe" (
+    echo Launching NFL Dashboard...
+    start "" "release\win-unpacked\NFL Dashboard.exe"
+    timeout /t 2 >nul
+    exit /b 0
+)
+
+echo ERROR: App not found!
+echo Please run setup-and-build.bat first to build the application.
 echo.
-echo App launched! Check your taskbar.
-echo.
-timeout /t 2 >nul
+pause
+exit /b 1

@@ -1,5 +1,5 @@
 import { Team, Game } from '../types';
-import { format } from 'date-fns';
+import { format, formatDistanceToNowStrict } from 'date-fns';
 import './Dashboard.css';
 
 interface DashboardProps {
@@ -12,6 +12,50 @@ interface DashboardProps {
   syncing: boolean;
 }
 
+function GameCard({ game }: { game: Game }) {
+  const isLive = game.inProgress === 1;
+
+  return (
+    <div className="game-info">
+      <div className="teams">
+        <div className="team">
+          <img src={game.awayTeamLogo} alt={game.awayTeamName} />
+          <span className="team-name">{game.awayTeamAbbr}</span>
+          {isLive && <span className="team-live-score">{game.awayScore}</span>}
+        </div>
+        <span className="vs">@</span>
+        <div className="team">
+          <img src={game.homeTeamLogo} alt={game.homeTeamName} />
+          <span className="team-name">{game.homeTeamAbbr}</span>
+          {isLive && <span className="team-live-score">{game.homeScore}</span>}
+        </div>
+      </div>
+
+      {isLive ? (
+        <div className="game-time live-now">
+          <span className="live-dot-small" />
+          {game.statusDetail || 'LIVE'}
+        </div>
+      ) : (
+        <>
+          <div className="game-time">
+            {format(new Date(game.timestamp), 'EEE, MMM d @ h:mm a')}
+          </div>
+          <div className="kickoff-countdown">
+            Kickoff in {formatDistanceToNowStrict(new Date(game.timestamp))}
+          </div>
+        </>
+      )}
+
+      {game.venue && (
+        <div className="game-location">
+          {game.venue}{game.city ? `, ${game.city}` : ''}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Dashboard({
   nextGameOverall,
   favoriteTeamNextGame,
@@ -22,10 +66,6 @@ function Dashboard({
   syncing
 }: DashboardProps) {
   const favoriteTeamData = allTeams.find(t => t.id === favoriteTeam);
-
-  const formatGameTime = (timestamp: number) => {
-    return format(new Date(timestamp), 'EEE, MMM d @ h:mm a');
-  };
 
   return (
     <div className="dashboard">
@@ -56,27 +96,9 @@ function Dashboard({
 
       <div className="dashboard-games">
         <div className="game-card next-game-overall">
-          <h3>Next NFL Game</h3>
+          <h3>{nextGameOverall?.inProgress === 1 ? 'Happening Now' : 'Next NFL Game'}</h3>
           {nextGameOverall ? (
-            <div className="game-info">
-              <div className="teams">
-                <div className="team">
-                  <img src={nextGameOverall.awayTeamLogo} alt={nextGameOverall.awayTeamName} />
-                  <span className="team-name">{nextGameOverall.awayTeamAbbr}</span>
-                </div>
-                <span className="vs">@</span>
-                <div className="team">
-                  <img src={nextGameOverall.homeTeamLogo} alt={nextGameOverall.homeTeamName} />
-                  <span className="team-name">{nextGameOverall.homeTeamAbbr}</span>
-                </div>
-              </div>
-              <div className="game-time">{formatGameTime(nextGameOverall.timestamp)}</div>
-              {nextGameOverall.venue && (
-                <div className="game-location">
-                  {nextGameOverall.venue}, {nextGameOverall.city}
-                </div>
-              )}
-            </div>
+            <GameCard game={nextGameOverall} />
           ) : (
             <p className="no-game">No upcoming games</p>
           )}
@@ -87,32 +109,20 @@ function Dashboard({
             {favoriteTeamData ? (
               <>
                 <img src={favoriteTeamData.logo} alt={favoriteTeamData.name} className="team-logo-small" />
-                {favoriteTeamData.displayName} - Next Game
+                {favoriteTeamData.displayName}
+                {favoriteTeamData.wins !== undefined && (
+                  <span className="header-record">
+                    ({favoriteTeamData.wins}-{favoriteTeamData.losses}{favoriteTeamData.ties ? `-${favoriteTeamData.ties}` : ''})
+                  </span>
+                )}
+                {' '}- Next Game
               </>
             ) : (
               'Your Team - Next Game'
             )}
           </h3>
           {favoriteTeamNextGame && favoriteTeam ? (
-            <div className="game-info">
-              <div className="teams">
-                <div className="team">
-                  <img src={favoriteTeamNextGame.awayTeamLogo} alt={favoriteTeamNextGame.awayTeamName} />
-                  <span className="team-name">{favoriteTeamNextGame.awayTeamAbbr}</span>
-                </div>
-                <span className="vs">@</span>
-                <div className="team">
-                  <img src={favoriteTeamNextGame.homeTeamLogo} alt={favoriteTeamNextGame.homeTeamName} />
-                  <span className="team-name">{favoriteTeamNextGame.homeTeamAbbr}</span>
-                </div>
-              </div>
-              <div className="game-time">{formatGameTime(favoriteTeamNextGame.timestamp)}</div>
-              {favoriteTeamNextGame.venue && (
-                <div className="game-location">
-                  {favoriteTeamNextGame.venue}, {favoriteTeamNextGame.city}
-                </div>
-              )}
-            </div>
+            <GameCard game={favoriteTeamNextGame} />
           ) : (
             <p className="no-game">
               {favoriteTeam ? 'No upcoming games' : 'Select a favorite team above'}

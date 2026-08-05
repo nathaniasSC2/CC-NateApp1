@@ -1,0 +1,119 @@
+.live-games-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  background: rgba(255, 68, 68, 0.06);
+  border-bottom: 1px solid rgba(255, 68, 68, 0.2);
+}
+
+.live-games-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #ff6666;
+  flex-shrink: 0;
+}
+
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff4444;
+  animation: live-bar-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes live-bar-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.live-games-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.live-games-list::-webkit-scrollbar {
+  display: none;
+}
+
+.live-game-chip {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  padding: 6px 8px 6px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.live-game-chip:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.live-game-chip img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.chip-abbr {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.chip-score {
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.chip-sep {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.chip-status {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff8888;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+.chip-pin {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  filter: grayscale(1);
+  opacity: 0.6;
+}
+
+.chip-pin:hover {
+  background: rgba(255, 255, 255, 0.16);
+  opacity: 1;
+}
+
+.chip-pin.pinned {
+  filter: none;
+  opacity: 1;
+  background: rgba(74, 158, 255, 0.25);
+}

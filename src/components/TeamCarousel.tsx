@@ -86,6 +86,11 @@ function TeamCarousel({ teams, selectedTeam, favoriteTeam, onSelectTeam, onSetFa
             <div className="team-info">
               <div className="team-abbr">{team.abbreviation}</div>
               <div className="team-name">{team.location}</div>
+              {team.wins !== undefined && (team.wins + (team.losses ?? 0) + (team.ties ?? 0)) > 0 && (
+                <div className="team-record">
+                  {team.wins}-{team.losses}{team.ties ? `-${team.ties}` : ''}
+                </div>
+              )}
             </div>
             {favoriteTeam === team.id && (
               <div className="favorite-badge">★</div>

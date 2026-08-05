@@ -1,5 +1,10 @@
 # Windows Build Issues - Troubleshooting Guide
 
+> **⚠️ HISTORICAL DOCUMENT — this only applies to v0.1.0.**
+> As of **v0.2.0**, the native `better-sqlite3` dependency was replaced with a
+> pure-JS store. `npm install` no longer compiles anything, so none of the fixes
+> below are needed. If you're seeing these errors, update to the latest code.
+
 ## Issue: Windows SDK Not Found
 
 If you see this error:

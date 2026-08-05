@@ -166,6 +166,46 @@
   margin-top: 6px;
 }
 
+.kickoff-countdown {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a9eff;
+  margin-top: 4px;
+}
+
+.game-time.live-now {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #ff6666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.live-dot-small {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4444;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.team-live-score {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.header-record {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.45);
+  margin-left: 4px;
+}
+
 .no-game {
   text-align: center;
   color: rgba(255, 255, 255, 0.4);

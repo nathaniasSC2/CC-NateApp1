@@ -3,7 +3,7 @@
   background: rgba(255, 255, 255, 0.03);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: 16px 60px;
-  height: 140px;
+  height: 154px;
 }
 
 .team-carousel {
@@ -102,6 +102,14 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.team-record {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.45);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
 }
 
 .favorite-badge {

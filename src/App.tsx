@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Team, Game, GameDetails } from './types';
 import Dashboard from './components/Dashboard';
 import TeamCarousel from './components/TeamCarousel';
 import GameSchedule from './components/GameSchedule';
 import GameDetailsPane from './components/GameDetailsPane';
+import LiveGamesBar from './components/LiveGamesBar';
 import './App.css';
 
 function App() {
@@ -17,26 +18,64 @@ function App() {
   const [teamSchedule, setTeamSchedule] = useState<Game[]>([]);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [gameDetails, setGameDetails] = useState<GameDetails | null>(null);
+  const [liveGames, setLiveGames] = useState<Game[]>([]);
+  const [pinnedGameIds, setPinnedGameIds] = useState<string[]>([]);
 
-  useEffect(() => {
-    loadInitialData();
+  const refreshOverview = useCallback(async (favTeamId: string | null) => {
+    const [nextGame, live, teams] = await Promise.all([
+      window.electronAPI.getNextGameOverall(),
+      window.electronAPI.getLiveGames(),
+      window.electronAPI.getAllTeams(),
+    ]);
+    setNextGameOverall(nextGame);
+    setLiveGames(live);
+    setAllTeams(teams);
+    if (favTeamId) {
+      setFavoriteTeamNextGame(await window.electronAPI.getTeamNextGame(favTeamId));
+    }
+    return teams;
   }, []);
 
   useEffect(() => {
+    loadInitialData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Live score pushes from the main process keep every view current
+  useEffect(() => {
+    const unsubscribeLive = window.electronAPI.onLiveScores(() => {
+      refreshOverview(favoriteTeam);
+      if (selectedTeam) {
+        window.electronAPI.getTeamSchedule(selectedTeam.id).then(setTeamSchedule);
+      }
+      if (selectedGame && selectedGame.completed !== 1) {
+        window.electronAPI.getGameDetails(selectedGame.id).then(setGameDetails);
+      }
+    });
+    const unsubscribePinned = window.electronAPI.onPinnedChanged(setPinnedGameIds);
+    return () => {
+      unsubscribeLive();
+      unsubscribePinned();
+    };
+  }, [favoriteTeam, selectedTeam, selectedGame, refreshOverview]);
+
+  useEffect(() => {
     if (favoriteTeam) {
-      loadFavoriteTeamData();
+      window.electronAPI.getTeamNextGame(favoriteTeam).then(setFavoriteTeamNextGame);
+    } else {
+      setFavoriteTeamNextGame(null);
     }
   }, [favoriteTeam]);
 
   useEffect(() => {
     if (selectedTeam) {
-      loadTeamSchedule(selectedTeam.id);
+      window.electronAPI.getTeamSchedule(selectedTeam.id).then(setTeamSchedule);
     }
   }, [selectedTeam]);
 
   useEffect(() => {
     if (selectedGame) {
-      loadGameDetails(selectedGame.id);
+      window.electronAPI.getGameDetails(selectedGame.id).then(setGameDetails);
     } else {
       setGameDetails(null);
     }
@@ -46,27 +85,19 @@ function App() {
     try {
       setLoading(true);
       setSyncing(true);
-
-      // Sync data from ESPN
       await window.electronAPI.syncNFLData();
       setSyncing(false);
 
-      // Load all teams
-      const teams = await window.electronAPI.getAllTeams();
-      setAllTeams(teams);
-
-      // Load next game overall
-      const nextGame = await window.electronAPI.getNextGameOverall();
-      setNextGameOverall(nextGame);
-
-      // Load favorite team
       const favTeam = await window.electronAPI.getFavoriteTeam();
       setFavoriteTeam(favTeam);
 
-      // Set first team as selected by default
-      if (teams.length > 0) {
-        setSelectedTeam(teams[0]);
-      }
+      const teams = await refreshOverview(favTeam);
+      const pinned = await window.electronAPI.getPinnedGameIds();
+      setPinnedGameIds(pinned);
+
+      // Default the schedule view to your favorite team, else the first team
+      const defaultTeam = teams.find(t => t.id === favTeam) ?? teams[0] ?? null;
+      setSelectedTeam(defaultTeam);
 
       setLoading(false);
     } catch (error) {
@@ -76,64 +107,36 @@ function App() {
     }
   };
 
-  const loadFavoriteTeamData = async () => {
-    if (!favoriteTeam) return;
-
-    try {
-      const nextGame = await window.electronAPI.getTeamNextGame(favoriteTeam);
-      setFavoriteTeamNextGame(nextGame);
-    } catch (error) {
-      console.error('Error loading favorite team data:', error);
-    }
-  };
-
-  const loadTeamSchedule = async (teamId: string) => {
-    try {
-      const schedule = await window.electronAPI.getTeamSchedule(teamId);
-      setTeamSchedule(schedule);
-    } catch (error) {
-      console.error('Error loading team schedule:', error);
-    }
-  };
-
-  const loadGameDetails = async (gameId: string) => {
-    try {
-      const details = await window.electronAPI.getGameDetails(gameId);
-      setGameDetails(details);
-    } catch (error) {
-      console.error('Error loading game details:', error);
-    }
-  };
-
   const handleSetFavoriteTeam = async (teamId: string) => {
-    try {
-      await window.electronAPI.setFavoriteTeam(teamId);
-      setFavoriteTeam(teamId);
-    } catch (error) {
-      console.error('Error setting favorite team:', error);
+    await window.electronAPI.setFavoriteTeam(teamId);
+    setFavoriteTeam(teamId);
+  };
+
+  const handleTogglePin = async (game: Game) => {
+    if (pinnedGameIds.includes(game.id)) {
+      await window.electronAPI.unpinGame(game.id);
+    } else {
+      await window.electronAPI.pinGame(game.id);
     }
+  };
+
+  const handleSelectLiveGame = (game: Game) => {
+    // Jump the schedule view to one of the teams playing, then open the game
+    const team = allTeams.find(t => t.id === game.homeTeamId || t.id === game.awayTeamId);
+    if (team) setSelectedTeam(team);
+    setSelectedGame(game);
   };
 
   const handleRefresh = async () => {
     setSyncing(true);
     try {
       await window.electronAPI.syncNFLData();
-
-      // Reload current data
-      const nextGame = await window.electronAPI.getNextGameOverall();
-      setNextGameOverall(nextGame);
-
-      if (favoriteTeam) {
-        const nextFavGame = await window.electronAPI.getTeamNextGame(favoriteTeam);
-        setFavoriteTeamNextGame(nextFavGame);
-      }
-
+      await refreshOverview(favoriteTeam);
       if (selectedTeam) {
-        await loadTeamSchedule(selectedTeam.id);
+        setTeamSchedule(await window.electronAPI.getTeamSchedule(selectedTeam.id));
       }
-
       if (selectedGame) {
-        await loadGameDetails(selectedGame.id);
+        setGameDetails(await window.electronAPI.getGameDetails(selectedGame.id));
       }
     } catch (error) {
       console.error('Error refreshing data:', error);
@@ -166,19 +169,32 @@ function App() {
         syncing={syncing}
       />
 
+      <LiveGamesBar
+        liveGames={liveGames}
+        pinnedGameIds={pinnedGameIds}
+        onTogglePin={handleTogglePin}
+        onSelectGame={handleSelectLiveGame}
+      />
+
       <div className="main-content">
         <div className="schedule-section">
           <GameSchedule
             team={selectedTeam}
             schedule={teamSchedule}
             selectedGame={selectedGame}
+            pinnedGameIds={pinnedGameIds}
             onSelectGame={setSelectedGame}
+            onTogglePin={handleTogglePin}
           />
         </div>
 
         {selectedGame && (
           <div className="details-section">
-            <GameDetailsPane gameDetails={gameDetails} />
+            <GameDetailsPane
+              gameDetails={gameDetails}
+              pinnedGameIds={pinnedGameIds}
+              onTogglePin={handleTogglePin}
+            />
           </div>
         )}
       </div>

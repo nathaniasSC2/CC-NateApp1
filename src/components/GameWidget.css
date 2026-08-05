@@ -1,0 +1,133 @@
+html, body, #root {
+  height: 100%;
+}
+
+.game-widget {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 14px 14px;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-sizing: border-box;
+  overflow: hidden;
+  /* The whole widget is a drag handle so it can be moved anywhere */
+  -webkit-app-region: drag;
+  user-select: none;
+  cursor: default;
+}
+
+.game-widget.live {
+  border-color: rgba(255, 68, 68, 0.55);
+}
+
+.game-widget.loading {
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 13px;
+}
+
+.widget-status-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 8px;
+}
+
+.widget-live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4444;
+  animation: widget-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes widget-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+.widget-status {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.widget-close {
+  -webkit-app-region: no-drag;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.widget-close:hover {
+  background: rgba(255, 68, 68, 0.35);
+  color: #ffffff;
+}
+
+.widget-matchup {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.widget-team {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.widget-team img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.widget-abbr {
+  font-size: 16px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.widget-score {
+  font-size: 26px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-team.winning .widget-score {
+  color: #4caf50;
+}
+
+.widget-team.winning .widget-abbr {
+  color: #ffffff;
+}
+
+.widget-at {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}

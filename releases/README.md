@@ -1,66 +1,49 @@
 # NFL Dashboard - Releases
 
-Download the latest version of the NFL Dashboard application.
-
 ## Latest Release
 
-### [v0.1.0 - Initial Release](./v0.1.0/) (November 11, 2025)
+### [v0.2.0 — Pinnable Live Game Widgets](./v0.2.0/) (August 5, 2026)
 
-**Build from Source:**
-- See [build instructions](./v0.1.0/README.md#build-from-source-recommended)
-- Windows, macOS, and Linux supported
-- ~5 minutes to build
+**Download and run — no build required:**
+- **[NFL-Dashboard-v0.2.0-win64.exe](./v0.2.0/NFL-Dashboard-v0.2.0-win64.exe)** (68 MB, Windows portable)
 
-**What's New:**
-- Initial release with full feature set
-- ESPN API integration for real-time NFL data
-- Beautiful team carousel
-- Game schedules and detailed statistics
-- Favorite team selection
-- SQLite local database
+**Highlights:**
+- 📌 Pin live/upcoming games as always-on-top mini widgets on your desktop
+- 🔴 Live games bar with one-click pinning
+- ⚡ Auto-refreshing live scores every 45s (no manual refresh)
+- 🧠 No native modules — building from source now needs zero build tools
+- Team W-L records, kickoff countdowns, dynamic season detection
 
-See the [v0.1.0 release notes](./v0.1.0/README.md) for full details.
+See the [v0.2.0 release notes](./v0.2.0/README.md) for full details.
 
 ---
 
 ## All Releases
 
-| Version | Date | Status |
-|---------|------|--------|
+| Version | Date | Download |
+|---------|------|----------|
+| [v0.2.0](./v0.2.0/) | Aug 5, 2026 | [Windows x64 portable exe](./v0.2.0/NFL-Dashboard-v0.2.0-win64.exe) |
 | [v0.1.0](./v0.1.0/) | Nov 11, 2025 | Build from source |
 
 ---
 
-## Installation Instructions
+## Installation
+
+### Windows (prebuilt)
+Download the .exe above and double-click it. Windows SmartScreen may warn about
+the unsigned executable — click **More info → Run anyway**.
 
 ### Building from Source (All Platforms)
 
-**Quick Start - Windows:**
+As of v0.2.0 there are no native modules, so any recent Node.js works with no
+extra build tools:
+
 ```cmd
-setup-and-build.bat    # One-click setup & build
-run-app.bat            # Run the app
+setup-and-build.bat    # Windows one-click setup & build
+run-app.bat            # Run the built app
 ```
-
-**Quick Start - Linux/Mac:**
 ```bash
-./setup-and-build.sh   # One-click setup & build
-```
-
-**Manual Commands:**
-```bash
-# Clone the repository
-git clone <repository-url>
-cd CC-NateApp1
-
-# Install dependencies
-npm install
-
-# For development
-npm run electron:dev
-
-# Build for your platform
-npm run build        # Auto-detect platform
-npm run build:win    # Windows
+./setup-and-build.sh   # Linux/Mac
 ```
 
 See the main [README.md](../README.md) for more details.
