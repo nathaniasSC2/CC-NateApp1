@@ -67,6 +67,12 @@ Then run:
 run-app.bat
 ```
 
+Want it on your desktop? This creates an "NFL Dashboard" shortcut there
+(works with the prebuilt exe too — no build needed):
+```cmd
+create-desktop-shortcut.bat
+```
+
 Or navigate to `release\win-unpacked\` and double-click `NFL Dashboard.exe`
 
 ### 🛠️ Development Mode
